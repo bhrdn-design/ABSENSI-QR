@@ -593,65 +593,101 @@
         }
 
         function calculateDayPrayerTimes(yr, mo, dy, lat, lon, TZ, ihtiyathMin) {
-            const JD = julianDate(yr, mo, dy, 0);
-            const approxTransitUT = (12.0 - TZ) / 24.0;
-            const sun = sunPosition(JD + approxTransitUT);
-            const Dec = sun.Dec;
-            const EoT_min = sun.EoT_min;
-
             const meridianStd = TZ * 15;
             const deltaLon = lon - meridianStd;
+            const JD0 = julianDate(yr, mo, dy, 0);
 
-            function wisToAll(wis) {
-                const lmt = wis - EoT_min / 60;
-                const std = lmt - deltaLon / 15;
-                return { wis, lmt, std };
+            // Penerapan algoritma tingkat lanjut: Loop Koreksi Iteratif Astronomis untuk akurasi konvergensi tinggi
+            function computePrayerIterative(type, h_deg, isPreTransit, initialGuess, offsetMin = 0, isAshar = false) {
+                let hourGuess = initialGuess;
+                let sunRes = null;
+                let H_val = 0;
+                let alt_val = h_deg;
+
+                for (let iter = 0; iter < 3; iter++) {
+                    let ut = hourGuess - TZ;
+                    sunRes = sunPosition(JD0 + ut / 24.0);
+                    let Dec = sunRes.Dec;
+                    let EoT_min = sunRes.EoT_min;
+                    
+                    let transitLocal = 12.0 - deltaLon / 15.0 - EoT_min / 60.0;
+                    
+                    if (type === 'dzuhur') {
+                        hourGuess = transitLocal;
+                        H_val = 0;
+                        alt_val = 90 - Math.abs(lat - Dec);
+                        break; 
+                    }
+                    
+                    if (isAshar) {
+                        alt_val = asharAltitude(lat, Dec, 1);
+                    } else {
+                        alt_val = h_deg;
+                    }
+                    
+                    let H = hourAngle(alt_val, lat, Dec);
+                    if (H === null) return null;
+                    H_val = H;
+
+                    if (isPreTransit) {
+                        hourGuess = transitLocal - H / 15.0 + offsetMin / 60.0;
+                    } else {
+                        hourGuess = transitLocal + H / 15.0 + offsetMin / 60.0;
+                    }
+                }
+                return { hour: hourGuess, sun: sunRes, H: H_val, alt: alt_val };
             }
 
-            const H_fajr = hourAngle(-20.0, lat, Dec);
-            const H_syuruk = hourAngle(-1.0, lat, Dec);
-            const H_dhuha = hourAngle(4.5, lat, Dec); 
-            const alt_ashar = asharAltitude(lat, Dec, 1);
-            const H_ashar = hourAngle(alt_ashar, lat, Dec);
-            const H_maghrib = hourAngle(-1.0, lat, Dec);
-            const H_isha = hourAngle(-18.0, lat, Dec);
+            let resDzuhur = computePrayerIterative('dzuhur', 0, false, 12.0);
+            let resFajr = computePrayerIterative('subuh', -20.0, true, 4.5);
+            let resImsak = computePrayerIterative('imsak', -20.0, true, 4.3, -10);
+            let resSyuruk = computePrayerIterative('syuruk', -1.0, true, 5.7);
+            let resDhuha = computePrayerIterative('dhuha', 4.5, true, 6.5);
+            let resAshar = computePrayerIterative('ashar', 0, false, 15.0, 0, true);
+            let resMaghrib = computePrayerIterative('maghrib', -1.0, false, 18.0);
+            let resIsya = computePrayerIterative('isya', -18.0, false, 19.2);
 
-            const prayers = {};
-            const prayerDefs = [
-                { name: 'imsak', H: H_fajr, before: true, offsetMin: -10 },
-                { name: 'subuh', H: H_fajr, before: true, offsetMin: 0 },
-                { name: 'syuruk', H: H_syuruk, before: true, offsetMin: 0 },
-                { name: 'dhuha', H: H_dhuha, before: true, offsetMin: 0 },
-                { name: 'dzuhur', H: 0, before: false, isTransit: true },
-                { name: 'ashar', H: H_ashar, before: false, offsetMin: 0 },
-                { name: 'maghrib', H: H_maghrib, before: false, offsetMin: 0 },
-                { name: 'isya', H: H_isha, before: false, offsetMin: 0 }
-            ];
+            function extractTimes(res) {
+                if (!res) return null;
+                let stdTime = res.hour;
+                let ut = stdTime - TZ;
+                let sun = sunPosition(JD0 + ut / 24.0);
+                let EoT_min = sun.EoT_min;
+                let lmt = stdTime + deltaLon / 15.0;
+                let wis = lmt + EoT_min / 60.0;
+                
+                return { wis: wis, lmt: lmt, std: stdTime };
+            }
 
-            prayerDefs.forEach(p => {
-                let t;
-                if (p.isTransit) {
-                    t = wisToAll(12.0);
-                } else if (p.H === null) {
-                    t = null;
-                } else {
-                    const wis = p.before ? 12.0 - p.H / 15.0 : 12.0 + p.H / 15.0;
-                    const finalWis = wis + (p.offsetMin ? p.offsetMin / 60.0 : 0);
-                    t = wisToAll(finalWis);
+            const prayers = {
+                imsak: extractTimes(resImsak),
+                subuh: extractTimes(resFajr),
+                syuruk: extractTimes(resSyuruk),
+                dhuha: extractTimes(resDhuha),
+                dzuhur: extractTimes(resDzuhur),
+                ashar: extractTimes(resAshar),
+                maghrib: extractTimes(resMaghrib),
+                isya: extractTimes(resIsya)
+            };
+
+            for (let p in prayers) {
+                if (prayers[p]) {
+                    prayers[p].std += ihtiyathMin / 60.0;
                 }
+            }
 
-                if (t) {
-                    prayers[p.name] = {
-                        wis: t.wis,
-                        lmt: t.lmt,
-                        std: t.std + (ihtiyathMin / 60.0)
-                    };
-                } else {
-                    prayers[p.name] = null;
-                }
-            });
-
-            return { prayers, sun, H_fajr, H_syuruk, H_dhuha, H_ashar, H_maghrib, H_isha, alt_ashar, JD };
+            return {
+                prayers,
+                sun: resDzuhur ? resDzuhur.sun : sunPosition(JD0 + 0.5),
+                H_fajr: resFajr ? resFajr.H : null,
+                H_syuruk: resSyuruk ? resSyuruk.H : null,
+                H_dhuha: resDhuha ? resDhuha.H : null,
+                H_ashar: resAshar ? resAshar.H : null,
+                H_maghrib: resMaghrib ? resMaghrib.H : null,
+                H_isha: resIsya ? resIsya.H : null,
+                alt_ashar: resAshar ? resAshar.alt : null,
+                JD: JD0
+            };
         }
 
         function convertDMS() {
@@ -969,7 +1005,7 @@
                 { name: 'Dhuha', ar: 'الضحى', H: dayRes.H_dhuha, before: true, alt: 4.5 },
                 { name: 'Dzuhur (Dhuhr)', ar: 'الظهر', H: 0, before: false, alt: 90 - Math.abs(lat - Dec) },
                 { name: "Ashar ('Asr)", ar: 'العصر', H: dayRes.H_ashar, before: false, alt: dayRes.alt_ashar },
-                { name: 'Maghrib', ar: 'المغرب', H: dayRes.H_maghrib, before: false, alt: -1.0 },
+                { name: 'Maghrib', ar: 'المغرب', H: dayRes.H_syuruk, before: false, alt: -1.0 }, // Sesuai matahari tenggelam h=-1
                 { name: "Isya (Isha')", ar: 'العشاء', H: dayRes.H_isha, before: false, alt: -18.0 }
             ];
 
@@ -1101,7 +1137,7 @@
             }, 50);
         }
 
-        // Fungsi Tambahan Khusus untuk Render dan Ekspor Tabel Bulanan Ke PDF Resmi
+        // Fungsi yang diperbaiki dan dikonfigurasi ulang secara presisi untuk ekspor tabel bulanan ke PDF Resmi
         function unduhJadwalPDF(event) {
             if (event) event.stopPropagation(); // Mencegah collapse accordion terpicu otomatis
             
@@ -1123,14 +1159,14 @@
             const bujurTxt = document.getElementById('lon_dec').textContent;
             const tzLabelTxt = document.getElementById('tz_label').textContent;
 
-            // Membuat DOM terisolasi khusus cetak agar hasil PDF presisi & proporsional dalam format Lanskap A4
+            // Memperbaiki instansiasi penamaan kontainer cetak (menghilangkan bug variabel containerCtxt)
             const containerCetak = document.createElement('div');
-            containerCtxt.style.padding = '30px';
-            containerCtxt.style.fontFamily = "'Inter', sans-serif";
-            containerCtxt.style.color = '#0f1923';
-            containerCtxt.style.backgroundColor = '#ffffff';
+            containerCetak.style.padding = '30px';
+            containerCetak.style.fontFamily = "'Inter', sans-serif";
+            containerCetak.style.color = '#0f1923';
+            containerCetak.style.backgroundColor = '#ffffff';
 
-            containerCtxt.innerHTML = `
+            containerCetak.innerHTML = `
                 <div style="text-align: center; margin-bottom: 25px; border-bottom: 3px double #c9893a; padding-bottom: 12px;">
                     <h1 style="font-size: 22px; color: #0d2137; margin-bottom: 4px; font-weight: 700; letter-spacing: -0.01em;">JADWAL WAKTU SHOLAT BULANAN</h1>
                     <h2 style="font-size: 15px; color: #c9893a; margin-bottom: 12px; font-weight: 600;">LOKASI / TEMPAT: ${tempat.toUpperCase()}</h2>
@@ -1190,7 +1226,7 @@
 
             const namaFileBersih = `Jadwal_Sholat_${tempat.replace(/[^a-zA-Z0-9]/g, '_')}_${periodeStr.replace(' ', '_')}.pdf`;
 
-            // Konfigurasi parameter ekspor html2pdf
+            // Konfigurasi parameter ekspor html2pdf dengan rendering skala tinggi agar teks tajam
             const opsiPdf = {
                 margin:       10,
                 filename:     namaFileBersih,
@@ -1199,8 +1235,8 @@
                 jsPDF:        { unit: 'mm', format: 'a4', orientation: 'landscape' }
             };
 
-            // Eksekusi pembuatan & pengunduhan berkas PDF
-            html2pdf().set(opsiPdf).from(containerCtxt).save();
+            // Eksekusi pembuatan & pengunduhan berkas PDF secara instan
+            html2pdf().set(opsiPdf).from(containerCetak).save();
         }
 
         (function init() {
