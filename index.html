@@ -270,7 +270,7 @@
     <div class="container">
         
         <div class="ayat-card">
-            <div class="ayat-ar">أَقِمِ ٱلصَّلَوٰةَ لِدُلُوكِ ٱلشَّمْسِ إِلَىٰ غَسَقِ ٱلَّيْلِ وَقُرْءَانَ ٱلْفَجْرِ ۖ إِنَّ قُرْءَانَ ٱلْفَجْرِ كَانَ مَشْهُودًا</div>
+            <div class="ayat-ar">أَقِمِ ٱلصَّلَوٰةَ لِدُلُوكِ ٱلشَّمْسِ إِلَىٰ غَسَقِ ٱلَّيْلِ وَقُرْءَانَ ٱلْفَجْرِ ۖ إِنَّ قُرْءَانَ ٱلْفَجْرِ كَانَ mَشْهُودًا</div>
             <div class="ayat-id">"Dirikanlah shalat dari sesudah matahari tergelincir sampai gelap malam dan (dirikanlah pula shalat) subuh. Sesungguhnya shalat subuh itu disaksikan (oleh malaikat)."</div>
             <div class="ayat-ref">QS. Al-Isra' : 78</div>
         </div>
@@ -1191,56 +1191,54 @@
             const containerCetak = document.createElement('div');
             containerCetak.style.width = '277mm'; 
             containerCetak.style.boxSizing = 'border-box';
-            containerCetak.style.padding = '10mm 12mm';
+            containerCetak.style.padding = '12mm 15mm';
             containerCetak.style.fontFamily = "'Inter', system-ui, sans-serif";
             containerCetak.style.color = '#1e293b';
             containerCetak.style.backgroundColor = '#ffffff';
             
-            // Menyembunyikan elemen cetak di luar layar Live DOM agar proses layout terbaca browser secara real-time
-            containerCetak.style.position = 'fixed';
-            containerCetak.style.left = '-9999px';
-            containerCetak.style.top = '0';
-            containerCetak.style.zIndex = '-9999';
-
+            // Penyematan ulang font eksternal langsung di dalam DOM bayangan cetak untuk menjamin pemuatan aset tulisan Arab & Mono
             containerCetak.innerHTML = `
-                <table style="width: 100%; border-collapse: collapse; margin-bottom: 8px;">
+                <style>
+                    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap');
+                </style>
+                <table style="width: 100%; border-collapse: collapse; margin-bottom: 12px;">
                     <tr>
-                        <td style="text-align: left; border: none; padding: 0 0 8px 0; vertical-align: bottom;">
-                            <h1 style="font-size: 20px; font-weight: 700; color: #0f172a; margin: 0 0 2px 0; letter-spacing: -0.02em; text-transform: uppercase;">Jadwal Waktu Shalat Bulanan</h1>
-                            <p style="font-size: 9.5px; color: #64748b; margin: 0; font-weight: 400;">Sistem Komputasi Falakiah · Berdasarkan Algoritma Astronomi Jean Meeus</p>
+                        <td style="text-align: left; border: none; padding: 0 0 10px 0; vertical-align: bottom;">
+                            <h1 style="font-size: 22px; font-weight: 700; color: #0f172a; margin: 0 0 4px 0; letter-spacing: -0.02em; text-transform: uppercase;">Jadwal Waktu Shalat Bulanan</h1>
+                            <p style="font-size: 10px; color: #64748b; margin: 0; font-weight: 400;">Sistem Komputasi Falakiah · Berdasarkan Algoritma Astronomi Jean Meeus</p>
                         </td>
-                        <td style="text-align: right; border: none; padding: 0 0 8px 0; vertical-align: bottom;">
-                            <h2 style="font-size: 15px; font-weight: 700; color: #c9893a; margin: 0 0 2px 0; text-transform: uppercase;">${tempat}</h2>
-                            <p style="font-size: 11px; font-weight: 600; color: #334155; margin: 0;">Periode: ${periodeStr} (${formatLabel})</p>
+                        <td style="text-align: right; border: none; padding: 0 0 10px 0; vertical-align: bottom;">
+                            <h2 style="font-size: 16px; font-weight: 700; color: #c9893a; margin: 0 0 4px 0; text-transform: uppercase;">${tempat}</h2>
+                            <p style="font-size: 12px; font-weight: 600; color: #334155; margin: 0;">Periode: ${periodeStr} (${formatLabel})</p>
                         </td>
                     </tr>
                     <tr>
-                        <td colspan="2" style="border-bottom: 2px solid #0f172a; padding: 0; height: 1px;"></td>
+                        <td colspan="2" style="border-bottom: 2.5px solid #0f172a; padding: 0; height: 1px;"></td>
                     </tr>
                 </table>
 
-                <table style="width: 100%; border-collapse: collapse; margin-bottom: 14px; font-size: 10px; color: #475569; background: #f8fafc; border: 1px solid #cbd5e1;">
+                <table style="width: 100%; border-collapse: collapse; margin-bottom: 16px; font-size: 10.5px; color: #475569; background: #f8fafc; border: 1px solid #cbd5e1;">
                     <tr>
-                        <td style="padding: 8px 12px; text-align: left; border: none;"><strong>Koordinat Lintang (φ):</strong> ${lintangTxt}</td>
-                        <td style="padding: 8px 12px; text-align: center; border: none;"><strong>Koordinat Bujur (λ):</strong> ${bujurTxt}</td>
-                        <td style="padding: 8px 12px; text-align: right; border: none;"><strong>Zona Waktu / Meridian:</strong> ${tzLabelTxt}</td>
+                        <td style="padding: 10px 14px; text-align: left; border: none; width:33.33%;"><strong>Koordinat Lintang (φ):</strong> ${lintangTxt}</td>
+                        <td style="padding: 10px 14px; text-align: center; border: none; width:33.33%;"><strong>Koordinat Bujur (λ):</strong> ${bujurTxt}</td>
+                        <td style="padding: 10px 14px; text-align: right; border: none; width:33.33%;"><strong>Zona Waktu / Meridian:</strong> ${tzLabelTxt}</td>
                     </tr>
                 </table>
 
-                <table style="width: 100%; border-collapse: collapse; font-size: 10px; line-height: 1.3;">
+                <table style="width: 100%; border-collapse: collapse; font-size: 10.5px; line-height: 1.4;">
                     <thead>
                         <tr style="background-color: #0f172a; color: #ffffff; text-align: center;">
-                            <th style="border: 1px solid #94a3b8; padding: 6px 4px; font-weight: 600; width: 4%;">No</th>
-                            <th style="border: 1px solid #94a3b8; padding: 6px 4px; font-weight: 600; width: 10%;">Tanggal</th>
-                            <th style="border: 1px solid #94a3b8; padding: 6px 8px; font-weight: 600; text-align: left; width: 16%;">Hari & Pasaran</th>
-                            <th style="border: 1px solid #94a3b8; padding: 6px 4px; font-weight: 600;">Imsak</th>
-                            <th style="border: 1px solid #94a3b8; padding: 6px 4px; font-weight: 600;">Subuh</th>
-                            <th style="border: 1px solid #94a3b8; padding: 6px 4px; font-weight: 600;">Syuruk</th>
-                            <th style="border: 1px solid #94a3b8; padding: 6px 4px; font-weight: 600;">Dhuha</th>
-                            <th style="border: 1px solid #94a3b8; padding: 6px 4px; font-weight: 600;">Dzuhur</th>
-                            <th style="border: 1px solid #94a3b8; padding: 6px 4px; font-weight: 600;">Ashar</th>
-                            <th style="border: 1px solid #94a3b8; padding: 6px 4px; font-weight: 600;">Maghrib</th>
-                            <th style="border: 1px solid #94a3b8; padding: 6px 4px; font-weight: 600;">Isya</th>
+                            <th style="border: 1px solid #475569; padding: 8px 5px; font-weight: 600; width: 4%;">No</th>
+                            <th style="border: 1px solid #475569; padding: 8px 5px; font-weight: 600; width: 11%;">Tanggal</th>
+                            <th style="border: 1px solid #475569; padding: 8px 10px; font-weight: 600; text-align: left; width: 17%;">Hari & Pasaran</th>
+                            <th style="border: 1px solid #475569; padding: 8px 5px; font-weight: 600;">Imsak</th>
+                            <th style="border: 1px solid #475569; padding: 8px 5px; font-weight: 600;">Subuh</th>
+                            <th style="border: 1px solid #475569; padding: 8px 5px; font-weight: 600;">Syuruk</th>
+                            <th style="border: 1px solid #475569; padding: 8px 5px; font-weight: 600;">Dhuha</th>
+                            <th style="border: 1px solid #475569; padding: 8px 5px; font-weight: 600;">Dzuhur</th>
+                            <th style="border: 1px solid #475569; padding: 8px 5px; font-weight: 600;">Ashar</th>
+                            <th style="border: 1px solid #475569; padding: 8px 5px; font-weight: 600;">Maghrib</th>
+                            <th style="border: 1px solid #475569; padding: 8px 5px; font-weight: 600;">Isya</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -1249,30 +1247,39 @@
                             const barisZebra = idx % 2 === 1 ? 'background-color: #f8fafc;' : 'background-color: #ffffff;';
                             return `
                                 <tr style="${barisZebra} text-align: center;">
-                                    <td style="border: 1px solid #cbd5e1; padding: 5px 4px; font-weight: 600; color: #475569; background-color: #f1f5f9;">${row.no}</td>
-                                    <td style="border: 1px solid #cbd5e1; padding: 5px 4px; font-family: 'JetBrains Mono', monospace; font-size: 9.5px; color: #334155;">${row.tanggal}</td>
-                                    <td style="border: 1px solid #cbd5e1; padding: 5px 8px; text-align: left; font-weight: 500; color: #0f172a; white-space: nowrap;">${row.hariPasaran}</td>
-                                    <td style="border: 1px solid #cbd5e1; padding: 5px 4px; color: #34495e;">${grabCell(row.times.imsak)}</td>
-                                    <td style="border: 1px solid #cbd5e1; padding: 5px 4px; font-weight: 600; color: #7c5cbf;">${grabCell(row.times.subuh)}</td>
-                                    <td style="border: 1px solid #cbd5e1; padding: 5px 4px; color: #3498db;">${grabCell(row.times.syuruk)}</td>
-                                    <td style="border: 1px solid #cbd5e1; padding: 5px 4px; color: #f1c40f;">${grabCell(row.times.dhuha)}</td>
-                                    <td style="border: 1px solid #cbd5e1; padding: 5px 4px; font-weight: 600; color: #c9893a;">${grabCell(row.times.dzuhur)}</td>
-                                    <td style="border: 1px solid #cbd5e1; padding: 5px 4px; color: #e67e22;">${grabCell(row.times.ashar)}</td>
-                                    <td style="border: 1px solid #cbd5e1; padding: 5px 4px; font-weight: 600; color: #e74c3c;">${grabCell(row.times.maghrib)}</td>
-                                    <td style="border: 1px solid #cbd5e1; padding: 5px 4px; color: #2c3e50;">${grabCell(row.times.isya)}</td>
+                                    <td style="border: 1px solid #cbd5e1; padding: 6px 5px; font-weight: 600; color: #475569; background-color: #f1f5f9;">${row.no}</td>
+                                    <td style="border: 1px solid #cbd5e1; padding: 6px 5px; font-family: 'JetBrains Mono', monospace; font-size: 10px; color: #334155;">${row.tanggal}</td>
+                                    <td style="border: 1px solid #cbd5e1; padding: 6px 10px; text-align: left; font-weight: 500; color: #0f172a; white-space: nowrap;">${row.hariPasaran}</td>
+                                    <td style="border: 1px solid #cbd5e1; padding: 6px 5px; font-family: 'JetBrains Mono', monospace; color: #34495e;">${grabCell(row.times.imsak)}</td>
+                                    <td style="border: 1px solid #cbd5e1; padding: 6px 5px; font-family: 'JetBrains Mono', monospace; font-weight: 600; color: #7c5cbf;">${grabCell(row.times.subuh)}</td>
+                                    <td style="border: 1px solid #cbd5e1; padding: 6px 5px; font-family: 'JetBrains Mono', monospace; color: #3498db;">${grabCell(row.times.syuruk)}</td>
+                                    <td style="border: 1px solid #cbd5e1; padding: 6px 5px; font-family: 'JetBrains Mono', monospace; color: #f1c40f;">${grabCell(row.times.dhuha)}</td>
+                                    <td style="border: 1px solid #cbd5e1; padding: 6px 5px; font-family: 'JetBrains Mono', monospace; font-weight: 600; color: #c9893a;">${grabCell(row.times.dzuhur)}</td>
+                                    <td style="border: 1px solid #cbd5e1; padding: 6px 5px; font-family: 'JetBrains Mono', monospace; color: #e67e22;">${grabCell(row.times.ashar)}</td>
+                                    <td style="border: 1px solid #cbd5e1; padding: 6px 5px; font-family: 'JetBrains Mono', monospace; font-weight: 600; color: #e74c3c;">${grabCell(row.times.maghrib)}</td>
+                                    <td style="border: 1px solid #cbd5e1; padding: 6px 5px; font-family: 'JetBrains Mono', monospace; color: #2c3e50;">${grabCell(row.times.isya)}</td>
                                 </tr>
                             `;
                         }).join('')}
                     </tbody>
                 </table>
 
-                <table style="width: 100%; border-collapse: collapse; margin-top: 14px; font-size: 8.5px; color: #94a3b8; border-top: 1px solid #cbd5e1;">
+                <table style="width: 100%; border-collapse: collapse; margin-top: 16px; font-size: 9px; color: #94a3b8; border-top: 1px solid #e2e8f0;">
                     <tr>
-                        <td style="padding: 6px 0; text-align: left; border: none;">* Waktu daerah di atas sudah termasuk penambahan nilai pengaman (Ihtiyath) sesuai standar Kemenag RI.</td>
-                        <td style="padding: 6px 0; text-align: right; border: none; font-style: italic;">Aplikasi Sistem Data Hisab Falak Independen Resmi · M. Sholeh Bakhruddin</td>
+                        <td style="padding: 8px 0; text-align: left; border: none; font-weight:400;">* Waktu daerah di atas sudah termasuk penambahan nilai pengaman (Ihtiyath) sesuai standar Kemenag RI.</td>
+                        <td style="padding: 8px 0; text-align: right; border: none; font-style: italic; font-weight:500;">Aplikasi Sistem Data Hisab Falak Independen Resmi · M. Sholeh Bakhruddin</td>
                     </tr>
                 </table>
             `;
+
+            // PERBAIKAN UTAMA: Menggunakan kombinasi letak absolut koordinat nol, z-index negatif terdalam, dan opacity penuh 1 
+            // agar terbaca sempurna oleh layout metrics tree html2canvas tanpa merusak/menggeser UI utama sistem
+            containerCetak.style.position = 'absolute';
+            containerCetak.style.left = '0';
+            containerCetak.style.top = '0';
+            containerCetak.style.zIndex = '-99999';
+            containerCetak.style.opacity = '1';
+            containerCetak.style.visibility = 'visible';
 
             document.body.appendChild(containerCetak);
 
@@ -1282,16 +1289,20 @@
                 margin:       0,
                 filename:     namaFileBersih,
                 image:        { type: 'jpeg', quality: 1.0 },
-                html2canvas:  { scale: 2.5, logging: false, useCORS: true, letterRendering: true },
+                // Penambahan scrollX/Y 0 menjamin pembacaan snapshot canvas konstan tidak terpotong berapapun jarak gulir layar user saat ini
+                html2pdf:     { useCORS: true },
+                html2canvas:  { scale: 2.2, logging: false, useCORS: true, letterRendering: true, scrollX: 0, scrollY: 0 },
                 jsPDF:        { unit: 'mm', format: 'a4', orientation: 'landscape' }
             };
 
-            // Menggunakan struktur penanganan Asynchronous Promise agar penghapusan DOM aman dilakukan setelah file selesai ter-render
+            // Menjalankan render secara Asynchronous via Promise pipeline demi kelancaran proses penghapusan DOM sisa
             html2pdf().set(opsiPdf).from(containerCetak).save().then(() => {
                 document.body.removeChild(containerCetak);
             }).catch((err) => {
-                console.error("PDF Render Error: ", err);
-                document.body.removeChild(containerCetak);
+                console.error("PDF Render Error internal system: ", err);
+                if(containerCetak.parentNode) {
+                    document.body.removeChild(containerCetak);
+                }
             });
         }
 
