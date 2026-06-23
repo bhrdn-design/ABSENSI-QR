@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hisab Falak — Waktu Sholat & Astronomi Matahari</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap');
         
         :root { 
             --ink: #0f1923; --ink-soft: #3a4a58; --ink-muted: #6b7f8e; 
@@ -194,10 +194,33 @@
         .lp-select option { background: var(--sky-deep); color: var(--white); }
         .lp-select:hover { background: rgba(201, 137, 58, 0.35); border-color: var(--gold-light); }
 
+        /* PANEL LINK UNDUH DI BAWAH TABEL BULANAN */
+        .download-action-panel {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            gap: 12px;
+            margin-top: 20px;
+            padding-top: 16px;
+            border-top: 1px solid var(--border);
+            flex-wrap: wrap;
+        }
+        .btn-download-txt {
+            background-color: #27ae60 !important;
+            border-color: #219653 !important;
+            color: var(--white) !important;
+        }
+        .btn-download-txt:hover {
+            background-color: #219653 !important;
+            box-shadow: 0 4px 12px rgba(39,174,96,0.3) !important;
+        }
+
         @media(max-width: 650px) {
             .live-panel { flex-direction: column; gap: 14px; padding: 18px; }
             .lp-date { border-right: none; border-bottom: 1px solid rgba(255,255,255,0.15); padding-right: 0; padding-bottom: 14px; text-align: center; }
             .lp-clock { min-width: 130px; }
+            .download-action-panel { justify-content: center; flex-direction: column; gap: 10px; }
+            .download-action-panel .btn-gps { width: 100%; justify-content: center; }
         }
 
         @media(max-width: 800px) {
@@ -247,7 +270,7 @@
     <div class="container">
         
         <div class="ayat-card">
-            <div class="ayat-ar">أَقِمِ ٱلصَّلَوٰةَ لِدُلُوكِ ٱلشَّمْسِ إِلَىٰ غَسَقِ ٱلَّيْلِ وَقُرْءَانَ ٱلْفَجْرِ ۖ إِنَّ قُرْءَانَ ٱلْفَجْرِ كَانَ mَشْهُودًا</div>
+            <div class="ayat-ar">أَقِمِ ٱلصَّلَوٰةَ لِدُلُوكِ ٱلشَّمْسِ إِلَىٰ غَسَقِ ٱلَّيْلِ وَقُرْءَانَ ٱلْفَجْرِ ۖ إِنَّ قُرْءَانَ ٱلْفَجْرِ كَانَ مَشْهُودًا</div>
             <div class="ayat-id">"Dirikanlah shalat dari sesudah matahari tergelincir sampai gelap malam dan (dirikanlah pula shalat) subuh. Sesungguhnya shalat subuh itu disaksikan (oleh malaikat)."</div>
             <div class="ayat-ref">QS. Al-Isra' : 78</div>
         </div>
@@ -352,7 +375,6 @@
                             <option value="lmt">Format: Waktu LMT</option>
                             <option value="wis">Format: Waktu WIS (Istiwa')</option>
                         </select>
-                        <button class="btn-gps" style="margin-left: 0; background: var(--sky-deep); color: var(--white); border-color: var(--gold);" onclick="unduhJadwalPDF(event)" type="button" title="Download Format Dokumen PDF Sebulan">📄 Unduh PDF</button>
                         <div class="toggle-icon">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
                         </div>
@@ -380,6 +402,11 @@
                                     </thead>
                                     <tbody id="monthly_tbody"></tbody>
                                 </table>
+                            </div>
+
+                            <div class="download-action-panel">
+                                <button class="btn-gps btn-download-txt" onclick="unduhJadwalTXT()" type="button" title="Unduh Jadwal Format Teks (.txt) Sesuai Pilihan Format">📝 Unduh TXT</button>
+                                <button class="btn-gps" style="background: var(--sky-deep); color: var(--white); border-color: var(--gold);" onclick="unduhJadwalPDF(event)" type="button" title="Download Format Dokumen Cetak PDF Cetak A4 Landscape">📄 Unduh PDF (A4 Landscape)</button>
                             </div>
                         </div>
                     </div>
@@ -597,7 +624,6 @@
             const deltaLon = lon - meridianStd;
             const JD0 = julianDate(yr, mo, dy, 0);
 
-            // Penerapan algoritma tingkat lanjut: Loop Koreksi Iteratif Astronomis untuk akurasi konvergensi tinggi
             function computePrayerIterative(type, h_deg, isPreTransit, initialGuess, offsetMin = 0, isAshar = false) {
                 let hourGuess = initialGuess;
                 let sunRes = null;
@@ -1005,7 +1031,7 @@
                 { name: 'Dhuha', ar: 'الضحى', H: dayRes.H_dhuha, before: true, alt: 4.5 },
                 { name: 'Dzuhur (Dhuhr)', ar: 'الظهر', H: 0, before: false, alt: 90 - Math.abs(lat - Dec) },
                 { name: "Ashar ('Asr)", ar: 'العصر', H: dayRes.H_ashar, before: false, alt: dayRes.alt_ashar },
-                { name: 'Maghrib', ar: 'المغرب', H: dayRes.H_syuruk, before: false, alt: -1.0 }, // Sesuai matahari tenggelam h=-1
+                { name: 'Maghrib', ar: 'المغرب', H: dayRes.H_syuruk, before: false, alt: -1.0 }, 
                 { name: "Isya (Isha')", ar: 'العشاء', H: dayRes.H_isha, before: false, alt: -18.0 }
             ];
 
@@ -1137,9 +1163,9 @@
             }, 50);
         }
 
-        // Fungsi yang diperbaiki dan dikonfigurasi ulang secara presisi untuk ekspor tabel bulanan ke PDF Resmi
+        // FUNGSI EKSPOR PDF LANDSCAPE PORTABEL DENGAN KOREKSI RENDER DAN SCALE RESOLUSI
         function unduhJadwalPDF(event) {
-            if (event) event.stopPropagation(); // Mencegah collapse accordion terpicu otomatis
+            if (event && event.stopPropagation) event.stopPropagation(); 
             
             if (!window.calculatedMonthlyData || window.calculatedMonthlyData.length === 0) {
                 alert('Silakan lakukan komputasi kalkulasi waktu sholat terlebih dahulu.');
@@ -1159,9 +1185,8 @@
             const bujurTxt = document.getElementById('lon_dec').textContent;
             const tzLabelTxt = document.getElementById('tz_label').textContent;
 
-            // Memperbaiki instansiasi penamaan kontainer cetak (menghilangkan bug variabel containerCtxt)
             const containerCetak = document.createElement('div');
-            containerCetak.style.padding = '30px';
+            containerCetak.style.padding = '35px';
             containerCetak.style.fontFamily = "'Inter', sans-serif";
             containerCetak.style.color = '#0f1923';
             containerCetak.style.backgroundColor = '#ffffff';
@@ -1184,17 +1209,17 @@
                 <table style="width: 100%; border-collapse: collapse; font-size: 11px; background-color: #ffffff;">
                     <thead>
                         <tr style="background-color: #0d2137; color: #ffffff; text-align: center;">
-                            <th style="border: 1px solid #dde4ec; padding: 8px 6px; font-weight: 700;">No</th>
-                            <th style="border: 1px solid #dde4ec; padding: 8px 6px; font-weight: 700;">Tanggal</th>
-                            <th style="border: 1px solid #dde4ec; padding: 8px 6px; font-weight: 700; text-align: left;">Hari & Pasaran</th>
-                            <th style="border: 1px solid #dde4ec; padding: 8px 6px; font-weight: 700;">Imsak</th>
-                            <th style="border: 1px solid #dde4ec; padding: 8px 6px; font-weight: 700;">Subuh</th>
-                            <th style="border: 1px solid #dde4ec; padding: 8px 6px; font-weight: 700;">Syuruk</th>
-                            <th style="border: 1px solid #dde4ec; padding: 8px 6px; font-weight: 700;">Dhuha</th>
-                            <th style="border: 1px solid #dde4ec; padding: 8px 6px; font-weight: 700;">Dzuhur</th>
-                            <th style="border: 1px solid #dde4ec; padding: 8px 6px; font-weight: 700;">Ashar</th>
-                            <th style="border: 1px solid #dde4ec; padding: 8px 6px; font-weight: 700;">Maghrib</th>
-                            <th style="border: 1px solid #dde4ec; padding: 8px 6px; font-weight: 700;">Isya</th>
+                            <th style="border: 1px solid #dde4ec; padding: 10px 6px; font-weight: 700;">No</th>
+                            <th style="border: 1px solid #dde4ec; padding: 10px 6px; font-weight: 700;">Tanggal</th>
+                            <th style="border: 1px solid #dde4ec; padding: 10px 6px; font-weight: 700; text-align: left;">Hari & Pasaran</th>
+                            <th style="border: 1px solid #dde4ec; padding: 10px 6px; font-weight: 700;">Imsak</th>
+                            <th style="border: 1px solid #dde4ec; padding: 10px 6px; font-weight: 700;">Subuh</th>
+                            <th style="border: 1px solid #dde4ec; padding: 10px 6px; font-weight: 700;">Syuruk</th>
+                            <th style="border: 1px solid #dde4ec; padding: 10px 6px; font-weight: 700;">Dhuha</th>
+                            <th style="border: 1px solid #dde4ec; padding: 10px 6px; font-weight: 700;">Dzuhur</th>
+                            <th style="border: 1px solid #dde4ec; padding: 10px 6px; font-weight: 700;">Ashar</th>
+                            <th style="border: 1px solid #dde4ec; padding: 10px 6px; font-weight: 700;">Maghrib</th>
+                            <th style="border: 1px solid #dde4ec; padding: 10px 6px; font-weight: 700;">Isya</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -1202,17 +1227,17 @@
                             const grabCell = (obj) => (obj ? hms(obj[formatWaktu]) : '—');
                             return `
                                 <tr style="text-align: center; border-bottom: 1px solid #dde4ec;">
-                                    <td style="border: 1px solid #dde4ec; padding: 6px 4px; font-weight: 700; background-color: #f7f9fb;">${row.no}</td>
-                                    <td style="border: 1px solid #dde4ec; padding: 6px 4px; font-family: monospace;">${row.tanggal}</td>
-                                    <td style="border: 1px solid #dde4ec; padding: 6px 6px; text-align: left; font-weight: 500;">${row.hariPasaran}</td>
-                                    <td style="border: 1px solid #dde4ec; padding: 6px 4px; color: #3a4a58;">${grabCell(row.times.imsak)}</td>
-                                    <td style="border: 1px solid #dde4ec; padding: 6px 4px; font-weight: 700; color: #7c5cbf;">${grabCell(row.times.subuh)}</td>
-                                    <td style="border: 1px solid #dde4ec; padding: 6px 4px; color: #2a5278;">${grabCell(row.times.syuruk)}</td>
-                                    <td style="border: 1px solid #dde4ec; padding: 6px 4px; color: #c9893a;">${grabCell(row.times.dhuha)}</td>
-                                    <td style="border: 1px solid #dde4ec; padding: 6px 4px; font-weight: 700; color: #0d2137;">${grabCell(row.times.dzuhur)}</td>
-                                    <td style="border: 1px solid #dde4ec; padding: 6px 4px; color: #e67e22;">${grabCell(row.times.ashar)}</td>
-                                    <td style="border: 1px solid #dde4ec; padding: 6px 4px; font-weight: 700; color: #e74c3c;">${grabCell(row.times.maghrib)}</td>
-                                    <td style="border: 1px solid #dde4ec; padding: 6px 4px; color: #2c3e50;">${grabCell(row.times.isya)}</td>
+                                    <td style="border: 1px solid #dde4ec; padding: 8px 4px; font-weight: 700; background-color: #f7f9fb;">${row.no}</td>
+                                    <td style="border: 1px solid #dde4ec; padding: 8px 4px; font-family: monospace;">${row.tanggal}</td>
+                                    <td style="border: 1px solid #dde4ec; padding: 8px 6px; text-align: left; font-weight: 500;">${row.hariPasaran}</td>
+                                    <td style="border: 1px solid #dde4ec; padding: 8px 4px; color: #3a4a58;">${grabCell(row.times.imsak)}</td>
+                                    <td style="border: 1px solid #dde4ec; padding: 8px 4px; font-weight: 700; color: #7c5cbf;">${grabCell(row.times.subuh)}</td>
+                                    <td style="border: 1px solid #dde4ec; padding: 8px 4px; color: #2a5278;">${grabCell(row.times.syuruk)}</td>
+                                    <td style="border: 1px solid #dde4ec; padding: 8px 4px; color: #c9893a;">${grabCell(row.times.dhuha)}</td>
+                                    <td style="border: 1px solid #dde4ec; padding: 8px 4px; font-weight: 700; color: #0d2137;">${grabCell(row.times.dzuhur)}</td>
+                                    <td style="border: 1px solid #dde4ec; padding: 8px 4px; color: #e67e22;">${grabCell(row.times.ashar)}</td>
+                                    <td style="border: 1px solid #dde4ec; padding: 8px 4px; font-weight: 700; color: #e74c3c;">${grabCell(row.times.maghrib)}</td>
+                                    <td style="border: 1px solid #dde4ec; padding: 8px 4px; color: #2c3e50;">${grabCell(row.times.isya)}</td>
                                 </tr>
                             `;
                         }).join('')}
@@ -1226,17 +1251,78 @@
 
             const namaFileBersih = `Jadwal_Sholat_${tempat.replace(/[^a-zA-Z0-9]/g, '_')}_${periodeStr.replace(' ', '_')}.pdf`;
 
-            // Konfigurasi parameter ekspor html2pdf dengan rendering skala tinggi agar teks tajam
             const opsiPdf = {
                 margin:       10,
                 filename:     namaFileBersih,
-                image:        { type: 'jpeg', quality: 0.98 },
+                image:        { type: 'jpeg', quality: 0.99 },
                 html2canvas:  { scale: 2.5, logging: false, useCORS: true },
                 jsPDF:        { unit: 'mm', format: 'a4', orientation: 'landscape' }
             };
 
-            // Eksekusi pembuatan & pengunduhan berkas PDF secara instan
             html2pdf().set(opsiPdf).from(containerCetak).save();
+        }
+
+        // FUNGSI STRUKTUR DATA UNTUK MENGEKSPOR DATA TABEL BULANAN KE FILE TEKS (.TXT) ASAL MONOSPACE
+        function unduhJadwalTXT() {
+            if (!window.calculatedMonthlyData || window.calculatedMonthlyData.length === 0) {
+                alert('Silakan lakukan komputasi kalkulasi waktu sholat terlebih dahulu.');
+                return;
+            }
+
+            const tempat = document.getElementById('place_name').value || '—';
+            const dateInput = document.getElementById('tgl_input').value;
+            const [tahun, bulan] = dateInput.split('-').map(Number);
+            const namaBulanIndo = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+            const periodeStr = `${namaBulanIndo[bulan-1]} ${tahun}`;
+            
+            const formatWaktu = document.getElementById('monthly_time_type').value;
+            const formatLabel = formatWaktu.toUpperCase();
+
+            const lintangTxt = document.getElementById('lat_dec').textContent;
+            const bujurTxt = document.getElementById('lon_dec').textContent;
+            const tzLabelTxt = document.getElementById('tz_label').textContent;
+
+            let outputText = "";
+            outputText += "=========================================================================================\n";
+            outputText += "                               JADWAL WAKTU SHOLAT BULANAN\n";
+            outputText += `                               LOKASI: ${tempat.toUpperCase()}\n`;
+            outputText += "=========================================================================================\n\n";
+            outputText += `Periode          : ${periodeStr}\n`;
+            outputText += `Format Tampilan  : Waktu ${formatLabel}\n`;
+            outputText += `Koordinat        : Lintang ${lintangTxt} · Bujur ${bujurTxt}\n`;
+            outputText += `Zona Waktu       : ${tzLabelTxt}\n`;
+            outputText += "-----------------------------------------------------------------------------------------\n";
+            outputText += "No   Tanggal     Hari & Pasaran       Imsak   Subuh   Syuruk  Dhuha   Dzuhur  Ashar   Maghrib Isya\n";
+            outputText += "-----------------------------------------------------------------------------------------\n";
+
+            window.calculatedMonthlyData.forEach(row => {
+                const grabCell = (obj) => (obj ? hms(obj[formatWaktu]) : '—:——:——');
+                
+                const formatNo = String(row.no).padStart(2, '0');
+                const formatTgl = row.tanggal.padEnd(12, ' ');
+                const formatHari = row.hariPasaran.padEnd(21, ' ');
+                
+                outputText += `${formatNo}   ${formatTgl}${formatHari}${grabCell(row.times.imsak)}   ${grabCell(row.times.subuh)}   ${grabCell(row.times.syuruk)}   ${grabCell(row.times.dhuha)}   ${grabCell(row.times.dzuhur)}   ${grabCell(row.times.ashar)}   ${grabCell(row.times.maghrib)}   ${grabCell(row.times.isya)}\n`;
+            });
+
+            outputText += "-----------------------------------------------------------------------------------------\n";
+            outputText += "Metode Perhitungan Komputasi Finis: Jean Meeus (Astronomical Algorithms, 1998)\n";
+            outputText += "Kriteria Sudut Parameter KEMENAG RI\n";
+            outputText += "Dokumen diunduh via Aplikasi Sistem Data Hisab Falak Independen Resmi.\n";
+
+            const namaFileBersih = `Jadwal_Sholat_${tempat.replace(/[^a-zA-Z0-9]/g, '_')}_${periodeStr.replace(' ', '_')}.txt`;
+            
+            const blob = new Blob([outputText], { type: 'text/plain;charset=utf-8;' });
+            const link = document.createElement("a");
+            if (link.download !== undefined) {
+                const url = URL.createObjectURL(blob);
+                link.setAttribute("href", url);
+                link.setAttribute("download", namaFileBersih);
+                link.style.visibility = 'hidden';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            }
         }
 
         (function init() {
