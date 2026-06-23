@@ -270,7 +270,7 @@
     <div class="container">
         
         <div class="ayat-card">
-            <div class="ayat-ar">أَقِمِ ٱلصَّلَوٰةَ لِدُلُوكِ ٱلشَّمْسِ إِلَىٰ غَسَقِ ٱلَّيْلِ وَقُرْءَانَ ٱلْفَجْرِ ۖ إِنَّ قُرْءَانَ ٱلْفَجْرِ كَانَ مَشْهُودًا</div>
+            <div class="ayat-ar">أَقِمِ ٱلصَّلَوٰةَ لِدُلُوكِ ٱلشَّمْسِ إِلَىٰ غَسَقِ ٱلَّيْلِ وَقُرْءَانَ ٱلْفَجْرِ ۖ إِنَّ قُرْءَانَ ٱلْفَجْرِ كَانَ mَشْهُودًا</div>
             <div class="ayat-id">"Dirikanlah shalat dari sesudah matahari tergelincir sampai gelap malam dan (dirikanlah pula shalat) subuh. Sesungguhnya shalat subuh itu disaksikan (oleh malaikat)."</div>
             <div class="ayat-ref">QS. Al-Isra' : 78</div>
         </div>
@@ -1163,7 +1163,7 @@
             }, 50);
         }
 
-        // FUNGSI EKSPOR PDF LANDSCAPE PORTABEL DENGAN KOREKSI RENDER DAN SCALE RESOLUSI
+        // FUNGSI EKSPOR PDF LANDSCAPE MINIMALIS MODERN - DIOPTIMALKAN COCOK UNTUK 1 KERTAS PENUH
         function unduhJadwalPDF(event) {
             if (event && event.stopPropagation) event.stopPropagation(); 
             
@@ -1185,77 +1185,86 @@
             const bujurTxt = document.getElementById('lon_dec').textContent;
             const tzLabelTxt = document.getElementById('tz_label').textContent;
 
+            // Membuat container cetak bayangan khusus PDF dengan layout super tipis, elegan dan presisi 1 Halaman A4
             const containerCetak = document.createElement('div');
-            containerCetak.style.padding = '35px';
-            containerCetak.style.fontFamily = "'Inter', sans-serif";
-            containerCetak.style.color = '#0f1923';
+            containerCetak.style.width = '277mm'; 
+            containerCetak.style.boxSizing = 'border-box';
+            containerCetak.style.padding = '8mm 10mm';
+            containerCetak.style.fontFamily = "'Inter', system-ui, -apple-system, sans-serif";
+            containerCetak.style.color = '#1e293b';
             containerCetak.style.backgroundColor = '#ffffff';
 
             containerCetak.innerHTML = `
-                <div style="text-align: center; margin-bottom: 25px; border-bottom: 3px double #c9893a; padding-bottom: 12px;">
-                    <h1 style="font-size: 22px; color: #0d2137; margin-bottom: 4px; font-weight: 700; letter-spacing: -0.01em;">JADWAL WAKTU SHOLAT BULANAN</h1>
-                    <h2 style="font-size: 15px; color: #c9893a; margin-bottom: 12px; font-weight: 600;">LOKASI / TEMPAT: ${tempat.toUpperCase()}</h2>
-                    <table style="width: 100%; font-size: 11px; color: #3a4a58; border-collapse: collapse; margin-top: 5px;">
-                        <tr>
-                            <td style="padding: 2px; text-align: left; font-weight: 500;">Periode: <strong>${periodeStr}</strong></td>
-                            <td style="padding: 2px; text-align: right; font-weight: 500;">Format Tampilan: <strong>Waktu ${formatLabel}</strong></td>
-                        </tr>
-                        <tr>
-                            <td style="padding: 2px; text-align: left; color: #6b7f8e;">Koordinat Geografis: Lintang ${lintangTxt} · Bujur ${bujurTxt}</td>
-                            <td style="padding: 2px; text-align: right; color: #6b7f8e;">Zona Waktu: ${tzLabelTxt}</td>
-                        </tr>
-                    </table>
+                <div style="display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 1.5px solid #cbd5e1; padding-bottom: 8px; margin-bottom: 10px;">
+                    <div>
+                        <h1 style="font-size: 18px; font-weight: 700; color: #0f172a; margin: 0 0 2px 0; letter-spacing: -0.02em; text-transform: uppercase;">Jadwal Waktu Shalat Bulanan</h1>
+                        <p style="font-size: 10px; color: #64748b; margin: 0; font-weight: 400;">Sistem Komputasi Falakiah · Berdasarkan Algoritma Astronomi Jean Meeus</p>
+                    </div>
+                    <div style="text-align: right;">
+                        <h2 style="font-size: 13px; font-weight: 600; color: #b45309; margin: 0 0 2px 0; text-transform: uppercase;">${tempat}</h2>
+                        <p style="font-size: 11px; font-weight: 600; color: #334155; margin: 0;">Periode: ${periodeStr} (${formatLabel})</p>
+                    </div>
                 </div>
-                <table style="width: 100%; border-collapse: collapse; font-size: 11px; background-color: #ffffff;">
+
+                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 12px; font-size: 9.5px; color: #475569; background: #f8fafc; padding: 6px 12px; border-radius: 6px; border: 1px solid #e2e8f0;">
+                    <div><strong>Koordinat Lintang (φ):</strong> ${lintangTxt}</div>
+                    <div><strong>Koordinat Bujur (λ):</strong> ${bujurTxt}</div>
+                    <div style="text-align: right;"><strong>Zona Waktu / Meridian:</strong> ${tzLabelTxt}</div>
+                </div>
+
+                <table style="width: 100%; border-collapse: collapse; font-size: 10px; line-height: 1.15;">
                     <thead>
-                        <tr style="background-color: #0d2137; color: #ffffff; text-align: center;">
-                            <th style="border: 1px solid #dde4ec; padding: 10px 6px; font-weight: 700;">No</th>
-                            <th style="border: 1px solid #dde4ec; padding: 10px 6px; font-weight: 700;">Tanggal</th>
-                            <th style="border: 1px solid #dde4ec; padding: 10px 6px; font-weight: 700; text-align: left;">Hari & Pasaran</th>
-                            <th style="border: 1px solid #dde4ec; padding: 10px 6px; font-weight: 700;">Imsak</th>
-                            <th style="border: 1px solid #dde4ec; padding: 10px 6px; font-weight: 700;">Subuh</th>
-                            <th style="border: 1px solid #dde4ec; padding: 10px 6px; font-weight: 700;">Syuruk</th>
-                            <th style="border: 1px solid #dde4ec; padding: 10px 6px; font-weight: 700;">Dhuha</th>
-                            <th style="border: 1px solid #dde4ec; padding: 10px 6px; font-weight: 700;">Dzuhur</th>
-                            <th style="border: 1px solid #dde4ec; padding: 10px 6px; font-weight: 700;">Ashar</th>
-                            <th style="border: 1px solid #dde4ec; padding: 10px 6px; font-weight: 700;">Maghrib</th>
-                            <th style="border: 1px solid #dde4ec; padding: 10px 6px; font-weight: 700;">Isya</th>
+                        <tr style="background-color: #0f172a; color: #ffffff; text-align: center;">
+                            <th style="border: 1px solid #cbd5e1; padding: 5px 3px; font-weight: 600; width: 3.5%;">No</th>
+                            <th style="border: 1px solid #cbd5e1; padding: 5px 3px; font-weight: 600; width: 9%;">Tanggal</th>
+                            <th style="border: 1px solid #cbd5e1; padding: 5px 5px; font-weight: 600; text-align: left; width: 14.5%;">Hari & Pasaran</th>
+                            <th style="border: 1px solid #cbd5e1; padding: 5px 3px; font-weight: 600;">Imsak</th>
+                            <th style="border: 1px solid #cbd5e1; padding: 5px 3px; font-weight: 600;">Subuh</th>
+                            <th style="border: 1px solid #cbd5e1; padding: 5px 3px; font-weight: 600;">Syuruk</th>
+                            <th style="border: 1px solid #cbd5e1; padding: 5px 3px; font-weight: 600;">Dhuha</th>
+                            <th style="border: 1px solid #cbd5e1; padding: 5px 3px; font-weight: 600;">Dzuhur</th>
+                            <th style="border: 1px solid #cbd5e1; padding: 5px 3px; font-weight: 600;">Ashar</th>
+                            <th style="border: 1px solid #cbd5e1; padding: 5px 3px; font-weight: 600;">Maghrib</th>
+                            <th style="border: 1px solid #cbd5e1; padding: 5px 3px; font-weight: 600;">Isya</th>
                         </tr>
                     </thead>
                     <tbody>
-                        ${window.calculatedMonthlyData.map(row => {
+                        ${window.calculatedMonthlyData.map((row, idx) => {
                             const grabCell = (obj) => (obj ? hms(obj[formatWaktu]) : '—');
+                            const barisZebra = idx % 2 === 1 ? 'background-color: #f8fafc;' : 'background-color: #ffffff;';
                             return `
-                                <tr style="text-align: center; border-bottom: 1px solid #dde4ec;">
-                                    <td style="border: 1px solid #dde4ec; padding: 8px 4px; font-weight: 700; background-color: #f7f9fb;">${row.no}</td>
-                                    <td style="border: 1px solid #dde4ec; padding: 8px 4px; font-family: monospace;">${row.tanggal}</td>
-                                    <td style="border: 1px solid #dde4ec; padding: 8px 6px; text-align: left; font-weight: 500;">${row.hariPasaran}</td>
-                                    <td style="border: 1px solid #dde4ec; padding: 8px 4px; color: #3a4a58;">${grabCell(row.times.imsak)}</td>
-                                    <td style="border: 1px solid #dde4ec; padding: 8px 4px; font-weight: 700; color: #7c5cbf;">${grabCell(row.times.subuh)}</td>
-                                    <td style="border: 1px solid #dde4ec; padding: 8px 4px; color: #2a5278;">${grabCell(row.times.syuruk)}</td>
-                                    <td style="border: 1px solid #dde4ec; padding: 8px 4px; color: #c9893a;">${grabCell(row.times.dhuha)}</td>
-                                    <td style="border: 1px solid #dde4ec; padding: 8px 4px; font-weight: 700; color: #0d2137;">${grabCell(row.times.dzuhur)}</td>
-                                    <td style="border: 1px solid #dde4ec; padding: 8px 4px; color: #e67e22;">${grabCell(row.times.ashar)}</td>
-                                    <td style="border: 1px solid #dde4ec; padding: 8px 4px; font-weight: 700; color: #e74c3c;">${grabCell(row.times.maghrib)}</td>
-                                    <td style="border: 1px solid #dde4ec; padding: 8px 4px; color: #2c3e50;">${grabCell(row.times.isya)}</td>
+                                <tr style="${barisZebra} text-align: center;">
+                                    <td style="border: 1px solid #e2e8f0; padding: 4.2px 3px; font-weight: 600; color: #64748b; background-color: #f1f5f9;">${row.no}</td>
+                                    <td style="border: 1px solid #e2e8f0; padding: 4.2px 3px; font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #475569;">${row.tanggal}</td>
+                                    <td style="border: 1px solid #e2e8f0; padding: 4.2px 5px; text-align: left; font-weight: 500; color: #0f172a; white-space: nowrap;">${row.hariPasaran}</td>
+                                    <td style="border: 1px solid #e2e8f0; padding: 4.2px 3px; color: #475569;">${grabCell(row.times.imsak)}</td>
+                                    <td style="border: 1px solid #e2e8f0; padding: 4.2px 3px; font-weight: 600; color: #4f46e5;">${grabCell(row.times.subuh)}</td>
+                                    <td style="border: 1px solid #e2e8f0; padding: 4.2px 3px; color: #0284c7;">${grabCell(row.times.syuruk)}</td>
+                                    <td style="border: 1px solid #e2e8f0; padding: 4.2px 3px; color: #b45309;">${grabCell(row.times.dhuha)}</td>
+                                    <td style="border: 1px solid #e2e8f0; padding: 4.2px 3px; font-weight: 600; color: #0f172a;">${grabCell(row.times.dzuhur)}</td>
+                                    <td style="border: 1px solid #e2e8f0; padding: 4.2px 3px; color: #ea580c;">${grabCell(row.times.ashar)}</td>
+                                    <td style="border: 1px solid #e2e8f0; padding: 4.2px 3px; font-weight: 600; color: #dc2626;">${grabCell(row.times.maghrib)}</td>
+                                    <td style="border: 1px solid #e2e8f0; padding: 4.2px 3px; color: #1e293b;">${grabCell(row.times.isya)}</td>
                                 </tr>
                             `;
                         }).join('')}
                     </tbody>
                 </table>
-                <div style="margin-top: 25px; font-size: 9px; color: #6b7f8e; text-align: center; border-top: 1px dashed #c9893a; padding-top: 8px; line-height: 1.4;">
-                    Metode Perhitungan Komputasi Finis: Jean Meeus (Astronomical Algorithms, 1998) · Kriteria Sudut Parameter KEMENAG RI <br>
-                    Dokumen ini diunduh secara sah melalui Aplikasi Sistem Data Hisab Falak Independen Resmi.
+
+                <div style="margin-top: 12px; font-size: 8.5px; color: #94a3b8; border-top: 1px solid #e2e8f0; padding-top: 6px; display: flex; justify-content: space-between; align-items: center;">
+                    <div>* Waktu daerah di atas sudah termasuk penambahan nilai pengaman (Ihtiyath) sesuai standar Kemenag RI.</div>
+                    <div style="text-align: right; font-style: italic;">Aplikasi Sistem Data Hisab Falak Independen Resmi</div>
                 </div>
             `;
 
             const namaFileBersih = `Jadwal_Sholat_${tempat.replace(/[^a-zA-Z0-9]/g, '_')}_${periodeStr.replace(' ', '_')}.pdf`;
 
+            // Opsi cetak presisi resolusi tinggi skala 3.0 tanpa margin bawaan (margin dikendalikan lewat CSS internal div)
             const opsiPdf = {
-                margin:       10,
+                margin:       0,
                 filename:     namaFileBersih,
-                image:        { type: 'jpeg', quality: 0.99 },
-                html2canvas:  { scale: 2.5, logging: false, useCORS: true },
+                image:        { type: 'jpeg', quality: 1.0 },
+                html2canvas:  { scale: 3.0, logging: false, useCORS: true, letterRendering: true },
                 jsPDF:        { unit: 'mm', format: 'a4', orientation: 'landscape' }
             };
 
