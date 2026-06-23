@@ -205,15 +205,6 @@
             border-top: 1px solid var(--border);
             flex-wrap: wrap;
         }
-        .btn-download-txt {
-            background-color: #7f8c8d !important;
-            border-color: #95a5a6 !important;
-            color: var(--white) !important;
-        }
-        .btn-download-txt:hover {
-            background-color: #95a5a6 !important;
-            box-shadow: 0 4px 12px rgba(127,140,141,0.3) !important;
-        }
         .btn-download-excel {
             background-color: #107c41 !important;
             border-color: #0b5930 !important;
@@ -279,7 +270,7 @@
     <div class="container">
         
         <div class="ayat-card">
-            <div class="ayat-ar">أَقِمِ ٱلصَّلَوٰةَ لِدُلُوكِ ٱلشَّمْسِ إِلَىٰ غَسَقِ ٱلَّيْلِ وَقُرْءَانَ ٱلْفَجْرِ ۖ إِنَّ قُرْءَانَ ٱلْفَجْرِ كَانَ مَشْهُودًا</div>
+            <div class="ayat-ar">أَقِمِ ٱلصَّلَوٰةَ لِدُلُوكِ ٱلشَّمْسِ إِلَىٰ غَسَقِ ٱلَّيْلِ وَقُرْءَانَ ٱلْفَجْرِ ۖ إِنَّ قُرْءَانَ ٱلْفَجْرِ كَانَ مَشْهُودًا</div>
             <div class="ayat-id">"Dirikanlah shalat dari sesudah matahari tergelincir sampai gelap malam dan (dirikanlah pula shalat) subuh. Sesungguhnya shalat subuh itu disaksikan (oleh malaikat)."</div>
             <div class="ayat-ref">QS. Al-Isra' : 78</div>
         </div>
@@ -416,7 +407,6 @@
                             </div>
 
                             <div class="download-action-panel">
-                                <button class="btn-gps btn-download-txt" onclick="unduhJadwalTXT()" type="button" title="Unduh Jadwal Format Teks (.txt)">📝 Unduh TXT</button>
                                 <button class="btn-gps btn-download-excel" onclick="unduhJadwalExcel()" type="button" title="Unduh Jadwal Format Excel Modern (.xls)">📊 Unduh Excel (.xls)</button>
                                 <button class="btn-gps" style="background: var(--sky-deep); color: var(--white); border-color: var(--gold);" onclick="unduhJadwalPDF(event)" type="button" title="Download Format Dokumen Cetak PDF Landscape">📄 Unduh PDF (A4 Landscape)</button>
                             </div>
@@ -514,7 +504,7 @@
         </div>
 
         <footer>
-            Hisab Falak  &nbsp;&middot;&nbsp; Jean Meeus, (1998) &nbsp;&middot;&nbsp; &nbsp;&middot;&nbsp;
+            Hisab Falak &nbsp;&middot;&nbsp; Jean Meeus, (1998) &nbsp;&middot;&nbsp; &nbsp;&middot;&nbsp;
              الحمد لله أن هذا الحساب قد انتهى <br>
             SEMOGA BERMANFAAT 🙏😊
         </footer>
@@ -1175,7 +1165,7 @@
             }, 50);
         }
 
-        // FUNGSI EKSPOR PDF LANDSCAPE MODERN - OPTIMALISASI BERGAYA BUKU LEDGER PERUSAHAAN
+        // FUNGSI EKSPOR PDF LANDSCAPE MODERN - PERBAIKAN ENGINE RENDER BERGAYA BUKU LEDGER
         function unduhJadwalPDF(event) {
             if (event && event.stopPropagation) event.stopPropagation(); 
             
@@ -1197,46 +1187,60 @@
             const bujurTxt = document.getElementById('lon_dec').textContent;
             const tzLabelTxt = document.getElementById('tz_label').textContent;
 
+            // Membuat kontainer cetak standard tabel semantik murni untuk akurasi tinggi pada html2canvas
             const containerCetak = document.createElement('div');
             containerCetak.style.width = '277mm'; 
             containerCetak.style.boxSizing = 'border-box';
-            containerCetak.style.padding = '8mm 10mm';
+            containerCetak.style.padding = '10mm 12mm';
             containerCetak.style.fontFamily = "'Inter', system-ui, sans-serif";
             containerCetak.style.color = '#1e293b';
             containerCetak.style.backgroundColor = '#ffffff';
+            
+            // Menyembunyikan elemen cetak di luar layar Live DOM agar proses layout terbaca browser secara real-time
+            containerCetak.style.position = 'fixed';
+            containerCetak.style.left = '-9999px';
+            containerCetak.style.top = '0';
+            containerCetak.style.zIndex = '-9999';
 
             containerCetak.innerHTML = `
-                <div style="display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 2px solid #0f172a; padding-bottom: 8px; margin-bottom: 12px;">
-                    <div>
-                        <h1 style="font-size: 19px; font-weight: 700; color: #0f172a; margin: 0 0 2px 0; letter-spacing: -0.02em; text-transform: uppercase;">Jadwal Waktu Shalat Bulanan</h1>
-                        <p style="font-size: 10px; color: #64748b; margin: 0; font-weight: 400;">Sistem Komputasi Falakiah · Berdasarkan Algoritma Astronomi Jean Meeus</p>
-                    </div>
-                    <div style="text-align: right;">
-                        <h2 style="font-size: 14px; font-weight: 700; color: #c9893a; margin: 0 0 2px 0; text-transform: uppercase;">${tempat}</h2>
-                        <p style="font-size: 11px; font-weight: 600; color: #334155; margin: 0;">Periode: ${periodeStr} (${formatLabel})</p>
-                    </div>
-                </div>
+                <table style="width: 100%; border-collapse: collapse; margin-bottom: 8px;">
+                    <tr>
+                        <td style="text-align: left; border: none; padding: 0 0 8px 0; vertical-align: bottom;">
+                            <h1 style="font-size: 20px; font-weight: 700; color: #0f172a; margin: 0 0 2px 0; letter-spacing: -0.02em; text-transform: uppercase;">Jadwal Waktu Shalat Bulanan</h1>
+                            <p style="font-size: 9.5px; color: #64748b; margin: 0; font-weight: 400;">Sistem Komputasi Falakiah · Berdasarkan Algoritma Astronomi Jean Meeus</p>
+                        </td>
+                        <td style="text-align: right; border: none; padding: 0 0 8px 0; vertical-align: bottom;">
+                            <h2 style="font-size: 15px; font-weight: 700; color: #c9893a; margin: 0 0 2px 0; text-transform: uppercase;">${tempat}</h2>
+                            <p style="font-size: 11px; font-weight: 600; color: #334155; margin: 0;">Periode: ${periodeStr} (${formatLabel})</p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="2" style="border-bottom: 2px solid #0f172a; padding: 0; height: 1px;"></td>
+                    </tr>
+                </table>
 
-                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 14px; font-size: 9.5px; color: #475569; background: #f8fafc; padding: 8px 12px; border-radius: 6px; border: 1px solid #cbd5e1;">
-                    <div><strong>Koordinat Lintang (φ):</strong> ${lintangTxt}</div>
-                    <div><strong>Koordinat Bujur (λ):</strong> ${bujurTxt}</div>
-                    <div style="text-align: right;"><strong>Zona Waktu / Meridian:</strong> ${tzLabelTxt}</div>
-                </div>
+                <table style="width: 100%; border-collapse: collapse; margin-bottom: 14px; font-size: 10px; color: #475569; background: #f8fafc; border: 1px solid #cbd5e1;">
+                    <tr>
+                        <td style="padding: 8px 12px; text-align: left; border: none;"><strong>Koordinat Lintang (φ):</strong> ${lintangTxt}</td>
+                        <td style="padding: 8px 12px; text-align: center; border: none;"><strong>Koordinat Bujur (λ):</strong> ${bujurTxt}</td>
+                        <td style="padding: 8px 12px; text-align: right; border: none;"><strong>Zona Waktu / Meridian:</strong> ${tzLabelTxt}</td>
+                    </tr>
+                </table>
 
-                <table style="width: 100%; border-collapse: collapse; font-size: 10px; line-height: 1.2;">
+                <table style="width: 100%; border-collapse: collapse; font-size: 10px; line-height: 1.3;">
                     <thead>
                         <tr style="background-color: #0f172a; color: #ffffff; text-align: center;">
-                            <th style="border: 1px solid #94a3b8; padding: 6px 3px; font-weight: 600; width: 4%;">No</th>
-                            <th style="border: 1px solid #94a3b8; padding: 6px 3px; font-weight: 600; width: 9%;">Tanggal</th>
-                            <th style="border: 1px solid #94a3b8; padding: 6px 6px; font-weight: 600; text-align: left; width: 15%;">Hari & Pasaran</th>
-                            <th style="border: 1px solid #94a3b8; padding: 6px 3px; font-weight: 600;">Imsak</th>
-                            <th style="border: 1px solid #94a3b8; padding: 6px 3px; font-weight: 600;">Subuh</th>
-                            <th style="border: 1px solid #94a3b8; padding: 6px 3px; font-weight: 600;">Syuruk</th>
-                            <th style="border: 1px solid #94a3b8; padding: 6px 3px; font-weight: 600;">Dhuha</th>
-                            <th style="border: 1px solid #94a3b8; padding: 6px 3px; font-weight: 600;">Dzuhur</th>
-                            <th style="border: 1px solid #94a3b8; padding: 6px 3px; font-weight: 600;">Ashar</th>
-                            <th style="border: 1px solid #94a3b8; padding: 6px 3px; font-weight: 600;">Maghrib</th>
-                            <th style="border: 1px solid #94a3b8; padding: 6px 3px; font-weight: 600;">Isya</th>
+                            <th style="border: 1px solid #94a3b8; padding: 6px 4px; font-weight: 600; width: 4%;">No</th>
+                            <th style="border: 1px solid #94a3b8; padding: 6px 4px; font-weight: 600; width: 10%;">Tanggal</th>
+                            <th style="border: 1px solid #94a3b8; padding: 6px 8px; font-weight: 600; text-align: left; width: 16%;">Hari & Pasaran</th>
+                            <th style="border: 1px solid #94a3b8; padding: 6px 4px; font-weight: 600;">Imsak</th>
+                            <th style="border: 1px solid #94a3b8; padding: 6px 4px; font-weight: 600;">Subuh</th>
+                            <th style="border: 1px solid #94a3b8; padding: 6px 4px; font-weight: 600;">Syuruk</th>
+                            <th style="border: 1px solid #94a3b8; padding: 6px 4px; font-weight: 600;">Dhuha</th>
+                            <th style="border: 1px solid #94a3b8; padding: 6px 4px; font-weight: 600;">Dzuhur</th>
+                            <th style="border: 1px solid #94a3b8; padding: 6px 4px; font-weight: 600;">Ashar</th>
+                            <th style="border: 1px solid #94a3b8; padding: 6px 4px; font-weight: 600;">Maghrib</th>
+                            <th style="border: 1px solid #94a3b8; padding: 6px 4px; font-weight: 600;">Isya</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -1245,28 +1249,32 @@
                             const barisZebra = idx % 2 === 1 ? 'background-color: #f8fafc;' : 'background-color: #ffffff;';
                             return `
                                 <tr style="${barisZebra} text-align: center;">
-                                    <td style="border: 1px solid #cbd5e1; padding: 5px 3px; font-weight: 600; color: #475569; background-color: #f1f5f9;">${row.no}</td>
-                                    <td style="border: 1px solid #cbd5e1; padding: 5px 3px; font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #334155;">${row.tanggal}</td>
-                                    <td style="border: 1px solid #cbd5e1; padding: 5px 6px; text-align: left; font-weight: 500; color: #0f172a; white-space: nowrap;">${row.hariPasaran}</td>
-                                    <td style="border: 1px solid #cbd5e1; padding: 5px 3px; color: #34495e;">${grabCell(row.times.imsak)}</td>
-                                    <td style="border: 1px solid #cbd5e1; padding: 5px 3px; font-weight: 600; color: #7c5cbf;">${grabCell(row.times.subuh)}</td>
-                                    <td style="border: 1px solid #cbd5e1; padding: 5px 3px; color: #3498db;">${grabCell(row.times.syuruk)}</td>
-                                    <td style="border: 1px solid #cbd5e1; padding: 5px 3px; color: #f1c40f;">${grabCell(row.times.dhuha)}</td>
-                                    <td style="border: 1px solid #cbd5e1; padding: 5px 3px; font-weight: 600; color: #c9893a;">${grabCell(row.times.dzuhur)}</td>
-                                    <td style="border: 1px solid #cbd5e1; padding: 5px 3px; color: #e67e22;">${grabCell(row.times.ashar)}</td>
-                                    <td style="border: 1px solid #cbd5e1; padding: 5px 3px; font-weight: 600; color: #e74c3c;">${grabCell(row.times.maghrib)}</td>
-                                    <td style="border: 1px solid #cbd5e1; padding: 5px 3px; color: #2c3e50;">${grabCell(row.times.isya)}</td>
+                                    <td style="border: 1px solid #cbd5e1; padding: 5px 4px; font-weight: 600; color: #475569; background-color: #f1f5f9;">${row.no}</td>
+                                    <td style="border: 1px solid #cbd5e1; padding: 5px 4px; font-family: 'JetBrains Mono', monospace; font-size: 9.5px; color: #334155;">${row.tanggal}</td>
+                                    <td style="border: 1px solid #cbd5e1; padding: 5px 8px; text-align: left; font-weight: 500; color: #0f172a; white-space: nowrap;">${row.hariPasaran}</td>
+                                    <td style="border: 1px solid #cbd5e1; padding: 5px 4px; color: #34495e;">${grabCell(row.times.imsak)}</td>
+                                    <td style="border: 1px solid #cbd5e1; padding: 5px 4px; font-weight: 600; color: #7c5cbf;">${grabCell(row.times.subuh)}</td>
+                                    <td style="border: 1px solid #cbd5e1; padding: 5px 4px; color: #3498db;">${grabCell(row.times.syuruk)}</td>
+                                    <td style="border: 1px solid #cbd5e1; padding: 5px 4px; color: #f1c40f;">${grabCell(row.times.dhuha)}</td>
+                                    <td style="border: 1px solid #cbd5e1; padding: 5px 4px; font-weight: 600; color: #c9893a;">${grabCell(row.times.dzuhur)}</td>
+                                    <td style="border: 1px solid #cbd5e1; padding: 5px 4px; color: #e67e22;">${grabCell(row.times.ashar)}</td>
+                                    <td style="border: 1px solid #cbd5e1; padding: 5px 4px; font-weight: 600; color: #e74c3c;">${grabCell(row.times.maghrib)}</td>
+                                    <td style="border: 1px solid #cbd5e1; padding: 5px 4px; color: #2c3e50;">${grabCell(row.times.isya)}</td>
                                 </tr>
                             `;
                         }).join('')}
                     </tbody>
                 </table>
 
-                <div style="margin-top: 14px; font-size: 8.5px; color: #94a3b8; border-top: 1px solid #cbd5e1; padding-top: 6px; display: flex; justify-content: space-between; align-items: center;">
-                    <div>* Waktu daerah di atas sudah termasuk penambahan nilai pengaman (Ihtiyath) sesuai standar Kemenag RI.</div>
-                    <div style="text-align: right; font-style: italic;">Aplikasi Sistem Data Hisab Falak Independen Resmi · M. Sholeh Bakhruddin</div>
-                </div>
+                <table style="width: 100%; border-collapse: collapse; margin-top: 14px; font-size: 8.5px; color: #94a3b8; border-top: 1px solid #cbd5e1;">
+                    <tr>
+                        <td style="padding: 6px 0; text-align: left; border: none;">* Waktu daerah di atas sudah termasuk penambahan nilai pengaman (Ihtiyath) sesuai standar Kemenag RI.</td>
+                        <td style="padding: 6px 0; text-align: right; border: none; font-style: italic;">Aplikasi Sistem Data Hisab Falak Independen Resmi · M. Sholeh Bakhruddin</td>
+                    </tr>
+                </table>
             `;
+
+            document.body.appendChild(containerCetak);
 
             const namaFileBersih = `Jadwal_Sholat_${tempat.replace(/[^a-zA-Z0-9]/g, '_')}_${periodeStr.replace(' ', '_')}.pdf`;
 
@@ -1274,14 +1282,20 @@
                 margin:       0,
                 filename:     namaFileBersih,
                 image:        { type: 'jpeg', quality: 1.0 },
-                html2canvas:  { scale: 3.0, logging: false, useCORS: true, letterRendering: true },
+                html2canvas:  { scale: 2.5, logging: false, useCORS: true, letterRendering: true },
                 jsPDF:        { unit: 'mm', format: 'a4', orientation: 'landscape' }
             };
 
-            html2pdf().set(opsiPdf).from(containerCetak).save();
+            // Menggunakan struktur penanganan Asynchronous Promise agar penghapusan DOM aman dilakukan setelah file selesai ter-render
+            html2pdf().set(opsiPdf).from(containerCetak).save().then(() => {
+                document.body.removeChild(containerCetak);
+            }).catch((err) => {
+                console.error("PDF Render Error: ", err);
+                document.body.removeChild(containerCetak);
+            });
         }
 
-        // FUNGSI EKSPOR NATIVE EXCEL SPREADSHEET (.XLS XML) DENGAN FORCED GRIDLINES & INTER-UI TYPOGRAPHY
+        // FUNGSI EKSPOR MULTI-SPREADSHEET COMPATIBLE EXCEL (.XLS MSO XML) DENGAN PENGUNCI DATA STRING
         function unduhJadwalExcel() {
             if (!window.calculatedMonthlyData || window.calculatedMonthlyData.length === 0) {
                 alert('Silakan lakukan komputasi kalkulasi waktu sholat terlebih dahulu.');
@@ -1301,34 +1315,36 @@
             const bujurTxt = document.getElementById('lon_dec').textContent;
             const tzLabelTxt = document.getElementById('tz_label').textContent;
 
-            // Membangun XML/HTML Spreadsheet Template Microsoft Excel dengan dukungan Gridlines
+            // Membangun XML/HTML Spreadsheet Template Microsoft Excel Resmi dengan instruksi Gridlines dan proteksi string teks waktu
             let excelTemplate = `
             <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
             <head>
             <meta charset="UTF-8">
             <style>
-                body { font-family: 'Segoe UI', system-ui, sans-serif; color: #1e293b; }
+                body { font-family: 'Segoe UI', Arial, sans-serif; color: #1e293b; }
                 .main-title { font-size: 16pt; font-weight: bold; color: #0d2137; text-align: left; }
                 .sub-title { font-size: 10pt; color: #6b7f8e; text-align: left; }
-                .meta-label { font-size: 9.5pt; font-weight: bold; background-color: #f1f5f9; border: 0.5pt solid #cbd5e1; }
-                .meta-value { font-size: 9.5pt; border: 0.5pt solid #cbd5e1; }
+                .meta-label { font-size: 10pt; font-weight: bold; background-color: #f1f5f9; border: 0.5pt solid #cbd5e1; }
+                .meta-value { font-size: 10pt; border: 0.5pt solid #cbd5e1; }
                 th { background-color: #0d2137; color: #ffffff; font-weight: bold; text-align: center; border: 0.5pt solid #475569; padding: 6px; font-size: 10pt; }
-                td { border: 0.5pt solid #cbd5e1; padding: 5px; text-align: center; font-size: 9.5pt; }
+                td { border: 0.5pt solid #cbd5e1; padding: 5px; text-align: center; font-size: 10pt; }
                 .no-col { background-color: #f8fafc; font-weight: bold; color: #475569; }
-                .date-col { font-family: 'Courier New', monospace; font-weight: bold; }
+                .date-col { font-family: 'Consolas', monospace; font-weight: bold; }
                 .day-col { text-align: left; font-weight: 500; }
-                .fajr-highlight { font-weight: bold; color: #4f46e5; }
-                .dhuhr-highlight { font-weight: bold; color: #b45309; }
-                .maghrib-highlight { font-weight: bold; color: #dc2626; }
+                /* Aturan CSS khusus agar aplikasi spreadsheet mendeteksi format sebagai Text, mencegah kerusakan pembacaan waktu sholat */
+                .txt-time { mso-number-format:"\\@"; font-family: 'Consolas', monospace; }
+                .fajr-highlight { font-weight: bold; color: #4f46e5; mso-number-format:"\\@"; font-family: 'Consolas', monospace; }
+                .dhuhr-highlight { font-weight: bold; color: #b45309; mso-number-format:"\\@"; font-family: 'Consolas', monospace; }
+                .maghrib-highlight { font-weight: bold; color: #dc2626; mso-number-format:"\\@"; font-family: 'Consolas', monospace; }
                 .zebra { background-color: #f8fafc; }
-                .footer-note { font-size: 8.5pt; color: #94a3b8; font-style: italic; }
+                .footer-note { font-size: 9pt; color: #94a3b8; font-style: italic; }
             </style>
             </head>
             <body>
                 <table>
                     <tr><td colspan="11" class="main-title">JADWAL WAKTU SHALAT BULANAN</td></tr>
                     <tr><td colspan="11" class="sub-title">Sistem Aplikasi Data Hisab Falak Independen Resmi · Berdasarkan Algoritma Astronomi Jean Meeus (1998)</td></tr>
-                    <tr></tr>
+                    <tr><td colspan="11"></td></tr>
                     <tr>
                         <td colspan="2" class="meta-label">Lokasi / Tempat</td>
                         <td colspan="3" class="meta-value" style="text-align: left; font-weight: bold; color: #b45309;">${tempat.toUpperCase()}</td>
@@ -1341,7 +1357,7 @@
                         <td colspan="2" class="meta-label">Format / Zona</td>
                         <td colspan="4" class="meta-value" style="text-align: left;">Waktu ${formatLabel} (${tzLabelTxt})</td>
                     </tr>
-                    <tr></tr>
+                    <tr><td colspan="11"></td></tr>
                     <thead>
                         <tr>
                             <th>No</th>
@@ -1369,22 +1385,22 @@
                         <td class="no-col">${row.no}</td>
                         <td class="date-col">${row.tanggal}</td>
                         <td class="day-col">${row.hariPasaran}</td>
-                        <td>${grabCell(row.times.imsak)}</td>
+                        <td class="txt-time">${grabCell(row.times.imsak)}</td>
                         <td class="fajr-highlight">${grabCell(row.times.subuh)}</td>
-                        <td>${grabCell(row.times.syuruk)}</td>
-                        <td>${grabCell(row.times.dhuha)}</td>
+                        <td class="txt-time">${grabCell(row.times.syuruk)}</td>
+                        <td class="txt-time">${grabCell(row.times.dhuha)}</td>
                         <td class="dhuhr-highlight">${grabCell(row.times.dzuhur)}</td>
-                        <td>${grabCell(row.times.ashar)}</td>
+                        <td class="txt-time">${grabCell(row.times.ashar)}</td>
                         <td class="maghrib-highlight">${grabCell(row.times.maghrib)}</td>
-                        <td>${grabCell(row.times.isya)}</td>
+                        <td class="txt-time">${grabCell(row.times.isya)}</td>
                     </tr>
                 `;
             });
 
             excelTemplate += `
                     </tbody>
-                    <tr></tr>
-                    <tr><td colspan="11" class="footer-note">* Waktu daerah di atas sudah termasuk penambahan nilai pengaman (Ihtiyath) 2 menit standar KEMENAG RI.</td></tr>
+                    <tr><td colspan="11"></td></tr>
+                    <tr><td colspan="11" class="footer-note">* Waktu daerah di atas sudah termasuk penambahan nilai pengaman (Ihtiyath) sesuai standar KEMENAG RI.</td></tr>
                     <tr><td colspan="11" class="footer-note">* Diunduh secara otomasi lewat sistem komputerisasi Falakiah M. Sholeh Bakhruddin.</td></tr>
                 </table>
             </body>
@@ -1393,70 +1409,8 @@
 
             const namaFileBersih = `Jadwal_Excel_${tempat.replace(/[^a-zA-Z0-9]/g, '_')}_${periodeStr.replace(' ', '_')}.xls`;
             
-            const blob = new Blob([excelTemplate], { type: 'application/vnd.ms-excel;charset=utf-8;' });
-            const link = document.createElement("a");
-            if (link.download !== undefined) {
-                const url = URL.createObjectURL(blob);
-                link.setAttribute("href", url);
-                link.setAttribute("download", namaFileBersih);
-                link.style.visibility = 'hidden';
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-            }
-        }
-
-        // FUNGSI STRUKTUR DATA UNTUK MENGEKSPOR DATA TABEL BULANAN KE FILE TEKS (.TXT) MONOSPACE ASLI
-        function unduhJadwalTXT() {
-            if (!window.calculatedMonthlyData || window.calculatedMonthlyData.length === 0) {
-                alert('Silakan lakukan komputasi kalkulasi waktu sholat terlebih dahulu.');
-                return;
-            }
-
-            const tempat = document.getElementById('place_name').value || '—';
-            const dateInput = document.getElementById('tgl_input').value;
-            const [tahun, bulan] = dateInput.split('-').map(Number);
-            const namaBulanIndo = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
-            const periodeStr = `${namaBulanIndo[bulan-1]} ${tahun}`;
-            
-            const formatWaktu = document.getElementById('monthly_time_type').value;
-            const formatLabel = formatWaktu.toUpperCase();
-
-            const lintangTxt = document.getElementById('lat_dec').textContent;
-            const bujurTxt = document.getElementById('lon_dec').textContent;
-            const tzLabelTxt = document.getElementById('tz_label').textContent;
-
-            let outputText = "";
-            outputText += "=========================================================================================\n";
-            outputText += "                               JADWAL WAKTU SHOLAT BULANAN\n";
-            outputText += `                               LOKASI: ${tempat.toUpperCase()}\n`;
-            outputText += "=========================================================================================\n\n";
-            outputText += `Periode          : ${periodeStr}\n`;
-            outputText += `Format Tampilan  : Waktu ${formatLabel}\n`;
-            outputText += `Koordinat        : Lintang ${lintangTxt} · Bujur ${bujurTxt}\n`;
-            outputText += `Zona Waktu       : ${tzLabelTxt}\n`;
-            outputText += "-----------------------------------------------------------------------------------------\n";
-            outputText += "No   Tanggal     Hari & Pasaran       Imsak   Subuh   Syuruk  Dhuha   Dzuhur  Ashar   Maghrib Isya\n";
-            outputText += "-----------------------------------------------------------------------------------------\n";
-
-            window.calculatedMonthlyData.forEach(row => {
-                const grabCell = (obj) => (obj ? hms(obj[formatWaktu]) : '—:——:——');
-                
-                const formatNo = String(row.no).padStart(2, '0');
-                const formatTgl = row.tanggal.padEnd(12, ' ');
-                const formatHari = row.hariPasaran.padEnd(21, ' ');
-                
-                outputText += `${formatNo}   ${formatTgl}${formatHari}${grabCell(row.times.imsak)}   ${grabCell(row.times.subuh)}   ${grabCell(row.times.syuruk)}   ${grabCell(row.times.dhuha)}   ${grabCell(row.times.dzuhur)}   ${grabCell(row.times.ashar)}   ${grabCell(row.times.maghrib)}   ${grabCell(row.times.isya)}\n`;
-            });
-
-            outputText += "-----------------------------------------------------------------------------------------\n";
-            outputText += "Metode Perhitungan Komputasi Finis: Jean Meeus (Astronomical Algorithms, 1998)\n";
-            outputText += "Kriteria Sudut Parameter KEMENAG RI\n";
-            outputText += "Dokumen diunduh via Aplikasi Sistem Data Hisab Falak Independen Resmi.\n";
-
-            const namaFileBersih = `Jadwal_Sholat_${tempat.replace(/[^a-zA-Z0-9]/g, '_')}_${periodeStr.replace(' ', '_')}.txt`;
-            
-            const blob = new Blob([outputText], { type: 'text/plain;charset=utf-8;' });
+            // Menginjeksikan BOM \uFEFF di depan string binary data stream untuk memaksa Excel membaca UTF-8 secara akurat
+            const blob = new Blob(['\uFEFF' + excelTemplate], { type: 'application/vnd.ms-excel;charset=utf-8;' });
             const link = document.createElement("a");
             if (link.download !== undefined) {
                 const url = URL.createObjectURL(blob);
