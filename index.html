@@ -1197,7 +1197,7 @@
             }, 50);
         }
 
-        // FUNGSI UNDUH EXCEL
+        // FUNGSI UNDUH EXCEL EKSISTING
         function unduhJadwalExcel() {
             if (!window.calculatedMonthlyData || window.calculatedMonthlyData.length === 0) {
                 alert('Silakan lakukan komputasi kalkulasi waktu sholat terlebih dahulu.');
@@ -1292,7 +1292,7 @@
             <body>
                 <table>
                     <tr><td colspan="27" class="main-title">JADWAL WAKTU SHALAT BULANAN</td></tr>
-                    <tr><td colspan="27" class="sub-title">Sistem Aplikasi Data Hisab Falak</td></tr>
+                    <tr><td colspan="27" class="sub-title">Sistem Aplikasi Data Hisab Falak — Jadwal Komparasi Terintegrasi</td></tr>
                     <tr><td colspan="27"></td></tr>
                     <tr>
                         <td colspan="3" class="meta-label">Lokasi / Tempat</td>
@@ -1375,16 +1375,18 @@
             }
         }
 
-        // FUNGSI UNDUH PDF - TINGKAT LANJUT (PENGELOMPOKAN DATA WAKTU SAMA)
+        // FUNGSI UNDUH PDF (BARU) MENGGUNAKAN jsPDF
         function unduhJadwalPDF() {
             if (!window.calculatedMonthlyData || window.calculatedMonthlyData.length === 0) {
                 alert('Silakan lakukan perhitungan waktu sholat terlebih dahulu.');
                 return;
             }
 
+            // Inisialisasi jsPDF mode Landscape untuk A4
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF('landscape', 'pt', 'a4');
 
+            // Ambil Meta Data
             const tempat = document.getElementById('place_name').value || '—';
             const dateInput = document.getElementById('tgl_input').value;
             const [tahun, bulan] = dateInput.split('-').map(Number);
@@ -1394,13 +1396,14 @@
             const bujurTxt = document.getElementById('lon_dec').textContent;
             const tzLabelTxt = document.getElementById('tz_label').textContent;
 
+            // Render Header PDF
             doc.setFontSize(16);
             doc.setFont("helvetica", "bold");
             doc.text("JADWAL WAKTU SHALAT BULANAN", 40, 40);
 
             doc.setFontSize(10);
             doc.setFont("helvetica", "normal");
-            doc.text("Sistem Aplikasi Data Hisab Falak", 40, 55);
+            doc.text("Sistem Aplikasi Data Hisab Falak — Jadwal Komparasi Terintegrasi", 40, 55);
 
             doc.setFontSize(9);
             doc.text(`Lokasi Tempat    : ${tempat.toUpperCase()}`, 40, 75);
@@ -1408,10 +1411,12 @@
             doc.text(`Periode Bulan    : ${namaBulanIndo[bulan-1]} ${tahun}`, 40, 101);
             doc.text(`Format / Zona    : ${tzLabelTxt} (STD / LMT / WIS)`, 40, 114);
 
+            // Persiapan Kolom dan Data Array untuk AutoTable
             const head = [
                 [
                     { content: 'No', rowSpan: 2, styles: { halign: 'center', valign: 'middle' } },
                     { content: 'Tanggal', rowSpan: 2, styles: { halign: 'center', valign: 'middle' } },
+                    { content: 'Hari & Pasaran', rowSpan: 2, styles: { halign: 'center', valign: 'middle' } },
                     { content: 'Imsak', colSpan: 3, styles: { halign: 'center' } },
                     { content: 'Subuh', colSpan: 3, styles: { halign: 'center' } },
                     { content: 'Syuruk', colSpan: 3, styles: { halign: 'center' } },
@@ -1422,24 +1427,23 @@
                     { content: 'Isya', colSpan: 3, styles: { halign: 'center' } }
                 ],
                 [
-                    'STD', 'LMT', 'WIS', 
-                    'STD', 'LMT', 'WIS', 
-                    'STD', 'LMT', 'WIS', 
-                    'STD', 'LMT', 'WIS', 
-                    'STD', 'LMT', 'WIS', 
-                    'STD', 'LMT', 'WIS', 
-                    'STD', 'LMT', 'WIS', 
-                    'STD', 'LMT', 'WIS'  
+                    'STD', 'LMT', 'WIS', // Imsak
+                    'STD', 'LMT', 'WIS', // Subuh
+                    'STD', 'LMT', 'WIS', // Syuruk
+                    'STD', 'LMT', 'WIS', // Dhuha
+                    'STD', 'LMT', 'WIS', // Dzuhur
+                    'STD', 'LMT', 'WIS', // Ashar
+                    'STD', 'LMT', 'WIS', // Maghrib
+                    'STD', 'LMT', 'WIS'  // Isya
                 ]
             ];
 
-            let groupedData = [];
-            let currentGroup = null;
-
-            window.calculatedMonthlyData.forEach(row => {
+            const body = window.calculatedMonthlyData.map(row => {
                 const makeCell = (obj) => obj ? [hms(obj.std), hms(obj.lmt), hms(obj.wis)] : ['—', '—', '—'];
-                
-                const timesArr = [
+                return [
+                    row.no,
+                    row.tanggal,
+                    row.hariPasaran,
                     ...makeCell(row.times.imsak),
                     ...makeCell(row.times.subuh),
                     ...makeCell(row.times.syuruk),
@@ -1449,48 +1453,9 @@
                     ...makeCell(row.times.maghrib),
                     ...makeCell(row.times.isya)
                 ];
-                
-                const timeString = JSON.stringify(timesArr);
-
-                if (!currentGroup) {
-                    currentGroup = {
-                        startNo: row.no,
-                        endNo: row.no,
-                        times: timesArr,
-                        timeString: timeString
-                    };
-                } else {
-                    if (currentGroup.timeString === timeString) {
-                        currentGroup.endNo = row.no; 
-                    } else {
-                        groupedData.push(currentGroup);
-                        currentGroup = {
-                            startNo: row.no,
-                            endNo: row.no,
-                            times: timesArr,
-                            timeString: timeString
-                        };
-                    }
-                }
-            });
-            
-            if (currentGroup) {
-                groupedData.push(currentGroup);
-            }
-
-            const body = groupedData.map(group => {
-                let noStr = group.startNo === group.endNo ? group.startNo.toString() : `${group.startNo}-${group.endNo}`;
-                let dateStr = group.startNo === group.endNo ? 
-                    `${group.startNo} ${namaBulanIndo[bulan-1]} ${tahun}` : 
-                    `${group.startNo}-${group.endNo} ${namaBulanIndo[bulan-1]} ${tahun}`;
-
-                return [
-                    noStr,
-                    dateStr,
-                    ...group.times
-                ];
             });
 
+            // Eksekusi Pembuatan Tabel
             doc.autoTable({
                 startY: 130,
                 head: head,
@@ -1499,14 +1464,19 @@
                 styles: { fontSize: 6.5, cellPadding: 2, halign: 'center', font: "helvetica" },
                 headStyles: { fillColor: [13, 33, 55], textColor: [255, 255, 255] },
                 alternateRowStyles: { fillColor: [248, 250, 252] },
+                columnStyles: {
+                    2: { halign: 'left' } // Rata kiri untuk Hari Pasaran
+                },
                 margin: { top: 30, right: 30, bottom: 30, left: 30 }
             });
 
+            // Tambahkan Catatan Footer (Ihtiyath)
             const finalY = doc.lastAutoTable.finalY || doc.autoTable.previous.finalY;
             doc.setFont("helvetica", "italic");
             doc.setFontSize(8);
             doc.text("* Waktu daerah (STD) pada tabel di atas sudah memperhitungkan penambahan nilai pengaman waktu (Ihtiyath).", 40, finalY + 15);
 
+            // Simpan Berkas PDF
             const namaFileBersih = `Jadwal_PDF_${tempat.replace(/[^a-zA-Z0-9]/g, '_')}_${tahun}_${bulan}.pdf`;
             doc.save(namaFileBersih);
         }
