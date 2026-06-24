@@ -271,7 +271,7 @@
     <div class="container">
         
         <div class="ayat-card">
-            <div class="ayat-ar">أَقِمِ ٱلصَّلَوٰةَ لِدُلُوكِ ٱلشَّمْسِ إِلَىٰ غَسَقِ ٱلَّيْلِ وَقُرْءَانَ ٱلْفَجْرِ ۖ إِنَّ قُرْءَانَ ٱلْفَجْرِ كَانَ مَشْهُودًا</div>
+            <div class="ayat-ar">أَقِمِ ٱلصَّلَوٰةَ لِدُلُوكِ ٱلشَّمْسِ إِلَىٰ غَسَقِ ٱلَّيْلِ وَقُرْءَانَ ٱلْفَجْرِ ۖ إِنَّ قُرْءَانَ ٱلْفَجْرِ كَانَ mَشْهُودًا</div>
             <div class="ayat-id">"Dirikanlah shalat dari sesudah matahari tergelincir sampai gelap malam dan (dirikanlah pula shalat) subuh. Sesungguhnya shalat subuh itu disaksikan (oleh malaikat)."</div>
             <div class="ayat-ref">QS. Al-Isra' : 78</div>
         </div>
@@ -280,7 +280,7 @@
             <div class="card-head">
                 <div style="display: flex; align-items: center; gap: 12px;">
                     <div class="icon">📍</div>
-                    <h2>Data Lokasi & Waktu</h2>
+                    <h2>Data Lokasi &amp; Waktu</h2>
                 </div>
                 <button id="btn_gps" class="btn-gps" onclick="getLocation()" type="button" title="Gunakan Lokasi Saat Ini Otomatis">🛰️ Lacak Lokasi GPS</button>
             </div>
@@ -293,7 +293,7 @@
                             <div class="dms-cell"><span>Menit ′</span><input type="number" id="lat_m" value="15" min="0" max="59" step="1" oninput="convertDMS()"></div>
                             <div class="dms-cell"><span>Detik ″</span><input type="number" id="lat_s" value="30" min="0" max="59.99" step="0.01" oninput="convertDMS()"></div>
                         </div>
-                        <div class="decimal-display" id="lat_dec">-7.258333°</div>
+                        <div class="decimal-display" id="lat_dec">-7.258333</div>
                     </div>
                     
                     <div class="field-group">
@@ -303,7 +303,7 @@
                             <div class="dms-cell"><span>Menit ′</span><input type="number" id="lon_m" value="45" min="0" max="59" step="1" oninput="convertDMS()"></div>
                             <div class="dms-cell"><span>Detik ″</span><input type="number" id="lon_s" value="0" min="0" max="59.99" step="0.01" oninput="convertDMS()"></div>
                         </div>
-                        <div class="decimal-display" id="lon_dec">112.750000°</div>
+                        <div class="decimal-display" id="lon_dec">112.750000</div>
                     </div>
                     
                     <div class="field-group">
@@ -547,7 +547,8 @@
         }
 
         function dmsStr(d) {
-            const s = d < 0 ? '−' : '';
+            const isNeg = d < 0 || Object.is(d, -0);
+            const s = isNeg ? '−' : '';
             d = Math.abs(d);
             const deg = Math.floor(d);
             const min = Math.floor((d - deg) * 60);
@@ -556,7 +557,8 @@
         }
 
         function dmsToDecimal(d, m, s) {
-            const sign = d < 0 ? -1 : 1;
+            const isNeg = d < 0 || Object.is(d, -0);
+            const sign = isNeg ? -1 : 1;
             return sign * (Math.abs(d) + m / 60 + s / 3600);
         }
 
@@ -725,12 +727,12 @@
             const ld = parseFloat(document.getElementById('lat_d').value) || 0;
             const lm = parseFloat(document.getElementById('lat_m').value) || 0;
             const ls = parseFloat(document.getElementById('lat_s').value) || 0;
-            document.getElementById('lat_dec').textContent = dmsToDecimal(ld,lm,ls).toFixed(6) + '°';
+            document.getElementById('lat_dec').textContent = dmsToDecimal(ld,lm,ls).toFixed(6);
 
             const od = parseFloat(document.getElementById('lon_d').value) || 0;
             const om = parseFloat(document.getElementById('lon_m').value) || 0;
             const os = parseFloat(document.getElementById('lon_s').value) || 0;
-            document.getElementById('lon_dec').textContent = dmsToDecimal(od,om,os).toFixed(6) + '°';
+            document.getElementById('lon_dec').textContent = dmsToDecimal(od,om,os).toFixed(6);
         }
 
         function updateTZLabel() {
@@ -773,7 +775,7 @@
                     const accuracy = position.coords.accuracy;
 
                     function formatToDms(dec) {
-                        const isNeg = dec < 0;
+                        const isNeg = dec < 0 || Object.is(dec, -0);
                         const absDec = Math.abs(dec);
                         const d = Math.floor(absDec);
                         const m = Math.floor((absDec - d) * 60);
@@ -916,10 +918,10 @@
                 }
 
                 const monthIndex = parseInt(m) - 1;
-                const namaBulan = bulanHijriyah[monthIndex] || m; 
+                const namaBulan営業 = bulanHijriyah[monthIndex] || m; 
                 const cleanYear = y.replace(/[^0-9]/g, '');
 
-                document.getElementById('lp_hijri').innerText = `${d} ${namaBulan} ${cleanYear} H`;
+                document.getElementById('lp_hijri').innerText = `${d} ${namaBulan営業} ${cleanYear} H`;
             } catch (e) {
                 document.getElementById('lp_hijri').innerText = "Sistem Hijriyah tidak didukung";
             }
@@ -996,11 +998,9 @@
             const EoT_min = sun.EoT_min;
             const JD = dayRes.JD;
 
-            // Perbaikan Manajemen Nama Zona Waktu pada Tabel Harian & Legenda Keterangan
             document.getElementById('th_prayer_std').innerHTML = `Waktu Daerah<span class="th-sub">${tzName}</span>`;
             document.getElementById('prayer_legend').innerHTML = `<strong>Waktu Daerah (${tzName})</strong>: Waktu resmi zona (${tzName}/UTC±) <strong>(+ Ihtiyath)</strong>. &nbsp;|&nbsp; <strong>LMT</strong>: Local Mean Time = ${tzName} + (λ_lokal − λ_meridian) × 4 menit/°. &nbsp;|&nbsp; <strong>WIS / Istiwa'</strong>: True Solar Time = LMT + EoT. Waktu berdasarkan posisi nyata matahari; saat transit selalu 12:00:00. <br><br> <strong>Kriteria Sudut:</strong> Imsak: Subuh − 10 Menit · Subuh −20° · Syuruk/Maghrib −1° (termasuk refraksi &amp; semidiameter) · Dhuha +4.5° · Ashar: arctan(1/(1+tan|φ−δ|)) [Syafi'i, faktor=1] · Isya −18° — sesuai <em>KEMENAG RI</em>.`;
 
-            // Perbaikan Sub-Header Tabel Bulanan Secara Dinamis Sesuai Zona Terpilih
             let subHeadHtml = '';
             for (let i = 0; i < 8; i++) {
                 subHeadHtml += `<th>${tzName}</th><th>LMT</th><th>WIS</th>`;
@@ -1008,7 +1008,7 @@
             document.getElementById('monthly_sub_head').innerHTML = subHeadHtml;
 
             const prayerDefs = [
-                { id: 'imsak', name: 'Imsak', ar: 'الإمساك', dot: 'dot-imsak' },
+                { id: 'imsak', name: 'Imsak', ar: 'الإمساak', dot: 'dot-imsak' },
                 { id: 'subuh', name: 'Subuh (Fajr)', ar: 'الفجر', dot: 'dot-fajr' },
                 { id: 'syuruk', name: 'Syuruk (Terbit)', ar: 'الشروق', dot: 'dot-syuruk' },
                 { id: 'dhuha', name: 'Dhuha', ar: 'الضحى', dot: 'dot-dhuha' },
@@ -1042,7 +1042,7 @@
             haAltTbody.innerHTML = '';
 
             const haDefs = [
-                { name: 'Imsak', ar: 'الإمساك', H: dayRes.H_fajr, before: true, alt: -20.0 },
+                { name: 'Imsak', ar: 'الإمساak', H: dayRes.H_fajr, before: true, alt: -20.0 },
                 { name: 'Subuh (Fajr)', ar: 'الفجر', H: dayRes.H_fajr, before: true, alt: -20.0 },
                 { name: 'Syuruk (Terbit)', ar: 'الشروق', H: dayRes.H_syuruk, before: true, alt: -1.0 },
                 { name: 'Dhuha', ar: 'الضحى', H: dayRes.H_dhuha, before: true, alt: 4.5 },
@@ -1180,7 +1180,6 @@
             }, 50);
         }
 
-        // FUNGSI EKSPOR EXCEL (.XLS XML): Diupdate Otomatis Mengikuti String Zona Waktu Aktif
         function unduhJadwalExcel() {
             if (!window.calculatedMonthlyData || window.calculatedMonthlyData.length === 0) {
                 alert('Silakan lakukan komputasi kalkulasi waktu sholat terlebih dahulu.');
@@ -1204,7 +1203,6 @@
             else if (tzRaw === 9) tzName = 'WIT';
             else if (!isNaN(tzRaw)) tzName = `UTC${tzRaw >= 0 ? '+' : ''}${tzRaw}`;
 
-            // Bangun Sub Header Dinamis untuk Excel
             let excelSubThs = '';
             for (let i = 0; i < 8; i++) {
                 excelSubThs += `<th class="sub-th">${tzName}</th><th class="sub-th">LMT</th><th class="sub-th">WIS</th>`;
