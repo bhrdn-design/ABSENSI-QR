@@ -363,7 +363,7 @@
                             <thead>
                                 <tr>
                                     <th style="text-align:left">Sholat</th>
-                                    <th id="th_prayer_std">Waktu Daerah<span class="th-sub">Standard Time</span></th>
+                                    <th id="th_prayer_std">Waktu Daerah<span class="th-sub">WIB</span></th>
                                     <th>Waktu LMT<span class="th-sub">Local Mean Time</span></th>
                                     <th>Waktu WIS<span class="th-sub">Istiwa / True Solar</span></th>
                                 </tr>
@@ -373,8 +373,8 @@
                     </div>
                     <br>
                     <div class="legend" id="prayer_legend">
-                        <strong>Waktu Daerah (STD)</strong>: Waktu resmi zona (WIB/WITA/WIT/UTC±) <strong>(+ Ihtiyath)</strong>. &nbsp;|&nbsp; 
-                        <strong>LMT</strong>: Local Mean Time = STD + (λ_lokal − λ_meridian) × 4 menit/°. &nbsp;|&nbsp; 
+                        <strong>Waktu Daerah (WIB)</strong>: Waktu resmi zona (WIB/WITA/WIT/UTC±) <strong>(+ Ihtiyath)</strong>. &nbsp;|&nbsp; 
+                        <strong>LMT</strong>: Local Mean Time = Waktu Daerah + (λ_lokal − λ_meridian) × 4 menit/°. &nbsp;|&nbsp; 
                         <strong>WIS / Istiwa'</strong>: True Solar Time = LMT + EoT. Waktu berdasarkan posisi nyata matahari; saat transit selalu 12:00:00. <br><br>
                         <strong>Kriteria Sudut:</strong> Imsak: Subuh − 10 Menit · Subuh −20° · Syuruk/Maghrib −1° (termasuk refraksi &amp; semidiameter) · Dhuha +4.5° · Ashar: arctan(1/(1+tan|φ−δ|)) [Syafi'i, faktor=1] · Isya −18° — sesuai <em>KEMENAG RI</em>.
                     </div>
@@ -411,14 +411,14 @@
                                             <th colspan="3">Isya</th>
                                         </tr>
                                         <tr class="m-sub-head" id="monthly_sub_head">
-                                            <th>STD</th><th>LMT</th><th>WIS</th>
-                                            <th>STD</th><th>LMT</th><th>WIS</th>
-                                            <th>STD</th><th>LMT</th><th>WIS</th>
-                                            <th>STD</th><th>LMT</th><th>WIS</th>
-                                            <th>STD</th><th>LMT</th><th>WIS</th>
-                                            <th>STD</th><th>LMT</th><th>WIS</th>
-                                            <th>STD</th><th>LMT</th><th>WIS</th>
-                                            <th>STD</th><th>LMT</th><th>WIS</th>
+                                            <th>WIB</th><th>LMT</th><th>WIS</th>
+                                            <th>WIB</th><th>LMT</th><th>WIS</th>
+                                            <th>WIB</th><th>LMT</th><th>WIS</th>
+                                            <th>WIB</th><th>LMT</th><th>WIS</th>
+                                            <th>WIB</th><th>LMT</th><th>WIS</th>
+                                            <th>WIB</th><th>LMT</th><th>WIS</th>
+                                            <th>WIB</th><th>LMT</th><th>WIS</th>
+                                            <th>WIB</th><th>LMT</th><th>WIS</th>
                                         </tr>
                                     </thead>
                                     <tbody id="monthly_tbody"></tbody>
@@ -1016,7 +1016,7 @@
             const JD = dayRes.JD;
 
             document.getElementById('th_prayer_std').innerHTML = `Waktu Daerah<span class="th-sub">${tzName}</span>`;
-            document.getElementById('prayer_legend').innerHTML = `<strong>Waktu Daerah (${tzName})</strong>: Waktu resmi zona (${tzName}/UTC±) <strong>(+ Ihtiyath)</strong>. &nbsp;|&nbsp; <strong>LMT</strong>: Local Mean Time = ${tzName} + (λ_lokal − λ_meridian) × 4 menit/°. &nbsp;|&nbsp; <strong>WIS / Istiwa'</strong>: True Solar Time = LMT + EoT. Waktu berdasarkan posisi nyata matahari; saat transit selalu 12:00:00. <br><br> <strong>Kriteria Sudut:</strong> Imsak: Subuh − 10 Menit · Subuh −20° · Syuruk/Maghrib −1° (termasuk refraksi &amp; semidiameter) · Dhuha +4.5° · Ashar: arctan(1/(1+tan|φ−δ|)) [Syafi'i, faktor=1] · Isya −18° — sesuai <em>KEMENAG RI</em>.`;
+            document.getElementById('prayer_legend').innerHTML = `<strong>Waktu Daerah (${tzName})</strong>: Waktu resmi zona (${tzName}/UTC±) <strong>(+ Ihtiyath)</strong>. &nbsp;|&nbsp; <strong>LMT</strong>: Local Mean Time = Waktu Daerah + (λ_lokal − λ_meridian) × 4 menit/°. &nbsp;|&nbsp; <strong>WIS / Istiwa'</strong>: True Solar Time = LMT + EoT. Waktu berdasarkan posisi nyata matahari; saat transit selalu 12:00:00. <br><br> <strong>Kriteria Sudut:</strong> Imsak: Subuh − 10 Menit · Subuh −20° · Syuruk/Maghrib −1° (termasuk refraksi &amp; semidiameter) · Dhuha +4.5° · Ashar: arctan(1/(1+tan|φ−δ|)) [Syafi'i, faktor=1] · Isya −18° — sesuai <em>KEMENAG RI</em>.`;
 
             let subHeadHtml = '';
             for (let i = 0; i < 8; i++) {
@@ -1375,7 +1375,7 @@
             }
         }
 
-        // FUNGSI UNDUH PDF (BARU) MENGGUNAKAN jsPDF
+        // FUNGSI UNDUH PDF YANG DIPERBARUI DENGAN VARIABEL ZONA WAKTU DINAMIS
         function unduhJadwalPDF() {
             if (!window.calculatedMonthlyData || window.calculatedMonthlyData.length === 0) {
                 alert('Silakan lakukan perhitungan waktu sholat terlebih dahulu.');
@@ -1396,6 +1396,14 @@
             const bujurTxt = document.getElementById('lon_dec').textContent;
             const tzLabelTxt = document.getElementById('tz_label').textContent;
 
+            // Logika Pembacaan Zona Waktu Dinamis untuk PDF
+            const tzRaw = parseFloat(document.getElementById('tz_input').value);
+            let tzName = 'GMT';
+            if (tzRaw === 7) tzName = 'WIB';
+            else if (tzRaw === 8) tzName = 'WITA';
+            else if (tzRaw === 9) tzName = 'WIT';
+            else if (!isNaN(tzRaw)) tzName = `UTC${tzRaw >= 0 ? '+' : ''}${tzRaw}`;
+
             // Render Header PDF
             doc.setFontSize(16);
             doc.setFont("helvetica", "bold");
@@ -1409,9 +1417,9 @@
             doc.text(`Lokasi Tempat    : ${tempat.toUpperCase()}`, 40, 75);
             doc.text(`Koordinat Geograf: Lintang ${lintangTxt} | Bujur ${bujurTxt}`, 40, 88);
             doc.text(`Periode Bulan    : ${namaBulanIndo[bulan-1]} ${tahun}`, 40, 101);
-            doc.text(`Format / Zona    : ${tzLabelTxt} (STD / LMT / WIS)`, 40, 114);
+            doc.text(`Format / Zona    : ${tzLabelTxt} (${tzName} / LMT / WIS)`, 40, 114);
 
-            // Persiapan Kolom dan Data Array untuk AutoTable
+            // Persiapan Kolom dan Data Array untuk AutoTable (Mengganti STD dengan variabel tzName)
             const head = [
                 [
                     { content: 'No', rowSpan: 2, styles: { halign: 'center', valign: 'middle' } },
@@ -1427,14 +1435,14 @@
                     { content: 'Isya', colSpan: 3, styles: { halign: 'center' } }
                 ],
                 [
-                    'STD', 'LMT', 'WIS', // Imsak
-                    'STD', 'LMT', 'WIS', // Subuh
-                    'STD', 'LMT', 'WIS', // Syuruk
-                    'STD', 'LMT', 'WIS', // Dhuha
-                    'STD', 'LMT', 'WIS', // Dzuhur
-                    'STD', 'LMT', 'WIS', // Ashar
-                    'STD', 'LMT', 'WIS', // Maghrib
-                    'STD', 'LMT', 'WIS'  // Isya
+                    tzName, 'LMT', 'WIS', // Imsak
+                    tzName, 'LMT', 'WIS', // Subuh
+                    tzName, 'LMT', 'WIS', // Syuruk
+                    tzName, 'LMT', 'WIS', // Dhuha
+                    tzName, 'LMT', 'WIS', // Dzuhur
+                    tzName, 'LMT', 'WIS', // Ashar
+                    tzName, 'LMT', 'WIS', // Maghrib
+                    tzName, 'LMT', 'WIS'  // Isya
                 ]
             ];
 
@@ -1470,11 +1478,11 @@
                 margin: { top: 30, right: 30, bottom: 30, left: 30 }
             });
 
-            // Tambahkan Catatan Footer (Ihtiyath)
+            // Tambahkan Catatan Footer Dinamis (Ihtiyath)
             const finalY = doc.lastAutoTable.finalY || doc.autoTable.previous.finalY;
             doc.setFont("helvetica", "italic");
             doc.setFontSize(8);
-            doc.text("* Waktu daerah (STD) pada tabel di atas sudah memperhitungkan penambahan nilai pengaman waktu (Ihtiyath).", 40, finalY + 15);
+            doc.text(`* Waktu daerah (${tzName}) pada tabel di atas sudah memperhitungkan penambahan nilai pengaman waktu (Ihtiyath).`, 40, finalY + 15);
 
             // Simpan Berkas PDF
             const namaFileBersih = `Jadwal_PDF_${tempat.replace(/[^a-zA-Z0-9]/g, '_')}_${tahun}_${bulan}.pdf`;
